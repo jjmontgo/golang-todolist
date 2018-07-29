@@ -11,16 +11,13 @@ import (
 )
 
 func init() {
-	http.HandleFunc("/", indexHandler)
+	router := InitRouter()
 	// prod will not have a .env, so it can ignore errors
 	_ = localEnvFile.Load()
-}
-
-func main() {
 	mode := os.Getenv("MODE")
 	if mode == "prod" {
 		// running lambda from api gateway
-		lambdaGoServerAdapter.ListenAndServe(http.DefaultServeMux, nil)
+		lambdaGoServerAdapter.ListenAndServe(router, nil)
 	} else if mode == "dev" {
 		// running from local machine
 		port := os.Getenv("PORT")
@@ -28,12 +25,15 @@ func main() {
 			port = "8080"
 		}
 		fmt.Println("Listening on port " + port + "...");
-		http.ListenAndServe(":"+port, nil)
+		http.ListenAndServe(":"+port, router)
 	} else {
 		panic("Failed to determine application mode: 'prod' or 'dev'")
 	}
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("index"))
+func main() {
 }
+
+
+
+

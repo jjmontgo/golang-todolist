@@ -1,4 +1,6 @@
 .env
+main
+main.zip
 
 # Binaries for programs and plugins
 *.exe
