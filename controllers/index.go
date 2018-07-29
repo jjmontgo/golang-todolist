@@ -1,7 +1,10 @@
 package controllers
 
-import "net/http"
+import (
+	"net/http"
+	"golang-todolist/templates"
+)
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("index"))
+	templates.LoadIndexTemplate().Execute(w, nil)
 }

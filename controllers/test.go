@@ -1,7 +1,10 @@
 package controllers
 
-import "net/http"
+import (
+	"net/http"
+	"golang-todolist/templates"
+)
 
 func Test(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("test"))
+	templates.LoadTestTemplate().Execute(w, nil)
 }
