@@ -6,5 +6,5 @@ import (
 )
 
 func Test(w http.ResponseWriter, r *http.Request) {
-	templates.LoadTestTemplate().Execute(w, nil)
+	templates.TestView.Execute(w, templateVars{})
 }

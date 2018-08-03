@@ -6,9 +6,19 @@ import (
 	"golang-todolist/model"
 )
 
+type todolist struct {
+	Id int
+	Name string
+}
+
+type templateVars struct {
+	Results []todolist
+	IndexURL string
+}
+
 func Index(w http.ResponseWriter, r *http.Request) {
 	db := model.DB()
-	results := []templates.Todolist{}
+	results := []todolist{}
 	rows, err := db.Query("SELECT * FROM todo_list")
 	if (err != nil) {
 		panic("Failed to load todo lists")
@@ -17,8 +27,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		var id int
 		var name string
 		rows.Scan(&id, &name)
-		list := templates.Todolist{id, name}
+		list := todolist{id, name}
 		results = append(results, list)
 	}
-	templates.ExecuteIndexTemplate(w, templates.TplIndexVars{results, ""})
+
+	templates.IndexView.Execute(w, templateVars{results, ""})
 }

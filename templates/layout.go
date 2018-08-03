@@ -1,6 +1,6 @@
 package templates
 
-const tplLayout =
+const TplLayout =
 `<html>
 <head>
 	<title></title>
