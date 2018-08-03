@@ -3,8 +3,7 @@ package model
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
-	// get config from .env when run locally
-	// localEnvFile "github.com/joho/godotenv"
+	"os"
 )
 
 var connectionEstablished bool
@@ -15,7 +14,11 @@ func DB() *sql.DB {
 	if connectionEstablished == true {
 		return db
 	}
-	db, err = sql.Open("mysql", "root:qazqaz@/golang_todolist")
+	user := os.Getenv("MYSQL_USERNAME")
+	password := os.Getenv("MYSQL_PASSWORD")
+	dbname := os.Getenv("MYSQL_DB")
+	host := os.Getenv("MYSQL_HOST")
+	db, err = sql.Open("mysql", user+":"+password+"@tcp("+host+")/"+dbname)
 	if err != nil {
 		panic(err.Error())
 	}

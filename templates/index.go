@@ -1,18 +1,39 @@
 package templates
 
+import "net/http"
 import "html/template"
+import "fmt"
+import "bytes"
+
+type Todolist struct {
+	Id int
+	Name string
+}
+
+type TplIndexVars struct {
+	Results []Todolist
+	IndexURL string
+}
 
 const tplIndex = `
-<h1>Index</h1>
-<p>This is the index template.</p>
-Lists:
-{{range .}}
-	<p>{{.Id}} {{.Name}}</p>
+{{define "content"}}
+	<h1>Index</h1>
+	<p>This is the index template.</p>
+	Lists from struct:
+	{{range .Results}}
+		<p>{{.Id}} {{.Name}}</p>
+	{{end}}
 {{end}}
 `
 
-func LoadIndexTemplate() *template.Template {
-	Index := template.New("index")
+func ExecuteIndexTemplate(w http.ResponseWriter, indexVars TplIndexVars) {
+	Index := template.New("content")
 	Index, _ = Index.Parse(tplIndex)
-	return Index
+	var renderedContent bytes.Buffer
+	if err := Index.Execute(&renderedContent, indexVars); err != nil {
+		fmt.Println(err)
+	}
+	Layout := template.New("layout")
+	Layout, _ = Layout.Parse(tplLayout)
+	Layout.Execute(w, template.HTML(renderedContent.String()))
 }
