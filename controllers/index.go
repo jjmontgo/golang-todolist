@@ -3,22 +3,12 @@ package controllers
 import (
 	"net/http"
 	"golang-todolist/templates"
-	"golang-todolist/model"
+	"golang-todolist/frame"
 )
 
-type todolist struct {
-	Id int
-	Name string
-}
-
-type templateVars struct {
-	Results []todolist
-	IndexURL string
-}
-
 func Index(w http.ResponseWriter, r *http.Request) {
-	db := model.DB()
-	results := []todolist{}
+	db := frame.DB()
+	results := []templates.Todolist{}
 	rows, err := db.Query("SELECT * FROM todo_list")
 	if (err != nil) {
 		panic("Failed to load todo lists")
@@ -27,9 +17,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		var id int
 		var name string
 		rows.Scan(&id, &name)
-		list := todolist{id, name}
+		list := templates.Todolist{id, name}
 		results = append(results, list)
 	}
 
-	templates.IndexView.Execute(w, templateVars{results, ""})
+	templates.IndexView.Execute(w, templates.IndexVars{results, ""})
 }

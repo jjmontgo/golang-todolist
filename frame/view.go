@@ -1,4 +1,4 @@
-package templates
+package frame
 
 import (
 	"net/http"
@@ -7,10 +7,13 @@ import (
 	"bytes"
 )
 
+// must be set by application
+var TplLayout string
+
 type View struct {
 	Name string
 	HasLayout bool
-	Vars interface{}
+	Vars interface{}	// gets set when View.Execute() is called
 	Template string
 }
 

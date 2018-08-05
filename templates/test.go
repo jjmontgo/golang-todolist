@@ -1,6 +1,8 @@
 package templates
 
-var TestView = View{
+import "golang-todolist/frame"
+
+var TestView = frame.View{
 	Name: "test",
 	HasLayout: true,
 	Template: `
