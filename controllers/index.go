@@ -21,5 +21,5 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		results = append(results, list)
 	}
 
-	templates.IndexView.Execute(w, templates.IndexVars{results, ""})
+	frame.ViewMgr.Get("index").Render(w, templates.IndexVars{results, ""})
 }

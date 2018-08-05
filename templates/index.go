@@ -12,15 +12,17 @@ type IndexVars struct {
 	IndexURL string
 }
 
-var IndexView = frame.View{
-	Name: "index",
-	HasLayout: true,
-	// IndexVars,
-	Template: `
-<h1>Index</h1>
-<p>This is the index template.</p>
-Lists from struct:
-{{range .Results}}
-	<p>{{.Id}} {{.Name}}</p>
-{{end}}
-`}
+func init() {
+	frame.ViewMgr.Add(frame.View{
+		Name: "index",
+		HasLayout: true,
+		// IndexVars,
+		Template: `
+	<h1>Index</h1>
+	<p>This is the index template.</p>
+	Lists from struct:
+	{{range .Results}}
+		<p>{{.Id}} {{.Name}}</p>
+	{{end}}
+	`})
+}

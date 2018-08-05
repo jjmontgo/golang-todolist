@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"net/http"
-	"golang-todolist/templates"
+	"golang-todolist/frame"
 )
 
 func Test(w http.ResponseWriter, r *http.Request) {
-	templates.TestView.Execute(w, nil)
+	frame.ViewMgr.Get("test").Render(w, nil)
 }

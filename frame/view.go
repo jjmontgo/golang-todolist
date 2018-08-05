@@ -7,29 +7,25 @@ import (
 	"bytes"
 )
 
-// must be set by application
-var TplLayout string
-
 type View struct {
 	Name string
 	HasLayout bool
 	Vars interface{}	// gets set when View.Execute() is called
 	Template string
+	ParsedTemplate *template.Template
 }
 
-func (this View) Execute(w http.ResponseWriter, vars interface{}) {
+func (this View) Render(w http.ResponseWriter, vars interface{}) {
 	this.Vars = vars
-	contentTemplate := template.New(this.Name)
-	contentTemplate, _ = contentTemplate.Parse(this.Template)
 	var renderedContent bytes.Buffer
-	if err := contentTemplate.Execute(&renderedContent, this.Vars); err != nil {
+	if err := this.ParsedTemplate.Execute(&renderedContent, this.Vars); err != nil {
 		fmt.Println(err)
 	}
 	if this.HasLayout {
 		layoutTemplate := template.New("layout")
-		layoutTemplate, _ = layoutTemplate.Parse(TplLayout)
+		layoutTemplate, _ = layoutTemplate.Parse(ViewMgr.LayoutTemplate)
 		layoutTemplate.Execute(w, template.HTML(renderedContent.String()))
 	} else {
-		contentTemplate.Execute(w, template.HTML(renderedContent.String()))
+		this.ParsedTemplate.Execute(w, template.HTML(renderedContent.String()))
 	}
 }
