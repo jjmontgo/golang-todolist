@@ -6,7 +6,17 @@ import (
 	"golang-todolist/frame"
 )
 
-func Index(w http.ResponseWriter, r *http.Request) {
+var IndexController IndexControllerType
+
+func init() {
+	IndexController = IndexControllerType{}
+}
+
+type IndexControllerType struct {
+	frame.Controller
+}
+
+func (this *IndexControllerType) Index(w http.ResponseWriter, r *http.Request) {
 	db := frame.DB()
 	results := []templates.Todolist{}
 	rows, err := db.Query("SELECT * FROM todo_list")
@@ -21,5 +31,5 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		results = append(results, list)
 	}
 
-	frame.ViewMgr.Get("index").Render(w, templates.IndexVars{results, ""})
+	this.Render(w, "index", templates.IndexVars{results, ""})
 }

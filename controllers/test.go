@@ -5,6 +5,16 @@ import (
 	"golang-todolist/frame"
 )
 
-func Test(w http.ResponseWriter, r *http.Request) {
-	frame.ViewMgr.Get("test").Render(w, nil)
+var TestController TestControllerType
+
+func init() {
+	TestController = TestControllerType{}
+}
+
+type TestControllerType struct {
+	frame.Controller
+}
+
+func (this *TestControllerType) Test(w http.ResponseWriter, r *http.Request) {
+	this.Render(w, "test", nil)
 }

@@ -8,7 +8,7 @@ import (
 
 func InitRouter() http.Handler {
 	r := mux.NewRouter()
-	r.HandleFunc("/", Index).Name("index")
-	r.HandleFunc("/test", Test).Name("test")
+	r.HandleFunc("/", IndexController.Index).Name("index")
+	r.HandleFunc("/test", TestController.Test).Name("test")
 	return r
 }

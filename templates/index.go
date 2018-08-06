@@ -16,7 +16,7 @@ func init() {
 	frame.ViewMgr.Add(frame.View{
 		Name: "index",
 		HasLayout: true,
-		// IndexVars,
+		// Vars,
 		Template: `
 	<h1>Index</h1>
 	<p>This is the index template.</p>
