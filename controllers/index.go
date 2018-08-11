@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"golang-todolist/templates"
 	"golang-todolist/frame"
+	"golang-todolist/model"
+	"log"
 )
 
 var IndexController IndexControllerType
@@ -17,19 +19,12 @@ type IndexControllerType struct {
 }
 
 func (this *IndexControllerType) Index(w http.ResponseWriter, r *http.Request) {
-	db := frame.DB()
-	results := []templates.Todolist{}
-	rows, err := db.Query("SELECT * FROM todo_list")
-	if (err != nil) {
-		panic("Failed to load todo lists")
-	}
-	for rows.Next() {
-		var id int
-		var name string
-		rows.Scan(&id, &name)
-		list := templates.Todolist{id, name}
-		results = append(results, list)
+	resultSet := frame.DB().Collection("todo_list").Find()
+	var todoLists []model.Todolist
+	err := resultSet.All(&todoLists)
+	if err != nil {
+		log.Fatalf("res.All(): %q\n", err)
 	}
 
-	this.Render(w, "index", templates.IndexVars{results, ""})
+	this.Render(w, "index", templates.IndexVars{todoLists, ""})
 }

@@ -1,14 +1,12 @@
 package templates
 
-import "golang-todolist/frame"
-
-type Todolist struct {
-	Id int
-	Name string
-}
+import (
+	"golang-todolist/frame"
+	"golang-todolist/model"
+)
 
 type IndexVars struct {
-	Results []Todolist
+	Results []model.Todolist
 	IndexURL string
 }
 

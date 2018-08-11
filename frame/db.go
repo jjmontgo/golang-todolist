@@ -1,36 +1,31 @@
 package frame
 
 import (
-	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
+	"upper.io/db.v2/mysql"
+	"upper.io/db.v2/lib/sqlbuilder"
 	"os"
+	"log"
 )
 
-var connectionEstablished bool
-var db *sql.DB
+var Db sqlbuilder.Database
 var err error
+var dbInitialized bool
 
-func DB() *sql.DB {
-	if connectionEstablished == true {
-		return db
+func DB() sqlbuilder.Database {
+	if dbInitialized == true {
+		return Db
 	}
-	user := os.Getenv("MYSQL_USERNAME")
-	password := os.Getenv("MYSQL_PASSWORD")
-	dbname := os.Getenv("MYSQL_DB")
-	host := os.Getenv("MYSQL_HOST")
-	db, err = sql.Open("mysql", user+":"+password+"@tcp("+host+")/"+dbname)
+
+	var settings = mysql.ConnectionURL{
+		Host: os.Getenv("MYSQL_HOST"),
+		User: os.Getenv("MYSQL_USERNAME"),
+		Password: os.Getenv("MYSQL_PASSWORD"),
+		Database: os.Getenv("MYSQL_DB")}
+
+	Db, err = mysql.Open(settings)
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("db.Open(): %q\n", err)
 	}
 
-	// Open doesn't open a connection. Validate DSN data:
-	err = db.Ping()
-	if err != nil {
-		panic(err.Error())
-	}
-
-	connectionEstablished = true;
-
-	return db
+	return Db
 }
-
