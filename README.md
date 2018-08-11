@@ -44,4 +44,5 @@ And run it locally:
 	To trigger the Lambda function from API Gateway while keeping w http.ResponseWriter, r *http.Request in handler functions.
 * github.com/gorilla/mux
 	Used for improved routing.
-* github.com/go-sql-driver/mysql
+* upper.io/db.v2/mysql
+	Used as data access layer.
