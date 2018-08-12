@@ -2,11 +2,11 @@ package templates
 
 import (
 	"golang-todolist/frame"
-	"golang-todolist/model"
+	"golang-todolist/model/todolist"
 )
 
 type IndexVars struct {
-	Results []model.Todolist
+	Results []todolist.Todolist
 	IndexURL string
 }
 
@@ -16,11 +16,12 @@ func init() {
 		HasLayout: true,
 		// Vars,
 		Template: `
-	<h1>Index</h1>
-	<p>This is the index template.</p>
-	Lists from struct:
-	{{range .Results}}
-		<p>{{.Id}} {{.Name}}</p>
-	{{end}}
+	<h1>Todo Lists</h1>
+	<p>These are your todo lists:</p>
+	<ul class="list-group">
+		{{range .Results}}
+			<li class="list-group-item">{{.Id}} {{.Name}}</li>
+		{{end}}
+	</ul>
 	`})
 }

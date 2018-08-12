@@ -38,6 +38,7 @@ And run it locally:
 
 ## Dependencies
 
+* Bootstrap 4.1 CSS Framework
 * github.com/joho/godotenv
 	To store dev environment variables in a .env file
 * github.com/akrylysov/algnhsa

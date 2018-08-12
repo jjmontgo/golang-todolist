@@ -1,30 +1,23 @@
 package controllers
 
 import (
-	"net/http"
 	"golang-todolist/templates"
 	"golang-todolist/frame"
-	"golang-todolist/model"
+	"golang-todolist/model/todolist"
 	"log"
 )
 
-var IndexController IndexControllerType
-
 func init() {
-	IndexController = IndexControllerType{}
+	newController := frame.NewController("IndexController")
+	newController.Actions["Index"] = func() {
+			resultSet := todolist.Collection().Find()
+			var todoLists []todolist.Todolist
+			err := resultSet.All(&todoLists)
+			if err != nil {
+				log.Fatalf("resultSet.All(): %q\n", err)
+			}
+			newController.Render("index", templates.IndexVars{todoLists, ""})
+		}
 }
 
-type IndexControllerType struct {
-	frame.Controller
-}
 
-func (this *IndexControllerType) Index(w http.ResponseWriter, r *http.Request) {
-	resultSet := frame.DB().Collection("todo_list").Find()
-	var todoLists []model.Todolist
-	err := resultSet.All(&todoLists)
-	if err != nil {
-		log.Fatalf("res.All(): %q\n", err)
-	}
-
-	this.Render(w, "index", templates.IndexVars{todoLists, ""})
-}
