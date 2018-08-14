@@ -1,12 +1,16 @@
 package frame
 
-import "net/http"
+import (
+	"net/http"
+	"github.com/gorilla/mux"
+)
 
 type Controller struct {
 	Name string
 	Actions map[string]func()
 	Response http.ResponseWriter
 	Request *http.Request
+	Router *mux.Router
 }
 
 func NewController(name string) *Controller {
@@ -17,5 +21,7 @@ func NewController(name string) *Controller {
 }
 
 func (this *Controller) Render(templateName string, vars interface{}) {
-	ViewMgr.Get(templateName).Render(this.Response, vars)
+	view := ViewMgr.Get(templateName)
+	view.Router = this.Router
+	view.Render(this.Response, vars)
 }

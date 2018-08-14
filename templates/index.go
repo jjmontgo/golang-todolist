@@ -11,12 +11,15 @@ type IndexVars struct {
 }
 
 func init() {
-	frame.ViewMgr.Add(frame.View{
+	frame.ViewMgr.Add(&frame.View{
 		Name: "index",
 		HasLayout: true,
 		// Vars,
 		Template: `
 	<h1>Todo Lists</h1>
+
+	<a href="{{route "todolist_create"}}">New Todolist</a>
+
 	<p>These are your todo lists:</p>
 	<ul class="list-group">
 		{{range .Results}}

@@ -3,7 +3,7 @@ package templates
 import "golang-todolist/frame"
 
 func init() {
-	frame.ViewMgr.Add(frame.View{
+	frame.ViewMgr.Add(&frame.View{
 	Name: "test",
 	HasLayout: true,
 	Template: `
