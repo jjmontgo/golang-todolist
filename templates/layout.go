@@ -3,7 +3,9 @@ package templates
 import "golang-todolist/frame"
 
 func init() {
-	frame.ViewMgr.SetLayout(
+	frame.NewView(&frame.View{
+		Name: "layout",
+		Template:
 `<!doctype html>
 <html lang="en">
 <head>
@@ -17,5 +19,5 @@ func init() {
 		{{.}}
 	</div>
 </body>
-</html>`)
+</html>`})
 }

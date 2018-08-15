@@ -4,27 +4,44 @@ import (
 	"html/template"
 	"bytes"
 	"log"
+	// "fmt"
 )
+
+func NewView(view *View) {
+	tpl := template.New(view.Name)
+	tpl.Funcs(template.FuncMap{
+		"route": view.Route,
+	})
+	if view.LayoutTemplateName == "" {
+		view.LayoutTemplateName = "layout"
+	}
+	tpl, _ = tpl.Parse(view.Template)
+	view.ParsedTemplate = tpl
+	Registry.Views[view.Name] = view
+}
 
 type View struct {
 	Name string
-	HasLayout bool
-	// Vars interface{}	// gets set when View.Execute() is called
 	Template string
+	HasLayout bool
+	LayoutTemplateName string // default to "layout"
 	ParsedTemplate *template.Template
 }
 
 func (this *View) Render(vars interface{}) {
-	var renderedContent bytes.Buffer
-	if err := this.ParsedTemplate.Execute(&renderedContent, vars); err != nil {
-		log.Fatalf("this.ParsedTemplate.Execute(): %q\n", err)
-	}
 	if this.HasLayout {
-		layoutTemplate := template.New("layout")
-		layoutTemplate, _ = layoutTemplate.Parse(ViewMgr.LayoutTemplate)
-		layoutTemplate.Execute(Registry.Response, template.HTML(renderedContent.String()))
+		// buffer the template to renderedContent
+		var renderedContent bytes.Buffer
+		if err := this.ParsedTemplate.Execute(&renderedContent, vars); err != nil {
+			log.Fatalf("this.ParsedTemplate.Execute(): %q\n", err)
+		}
+		// render the content to the layout as html
+		layoutView := Registry.Views[this.LayoutTemplateName]
+		html := template.HTML(renderedContent.String())
+		layoutView.Render(html)
 	} else {
-		this.ParsedTemplate.Execute(Registry.Response, template.HTML(renderedContent.String()))
+		// render the template to the response with no layout
+		this.ParsedTemplate.Execute(Registry.Response, vars)
 	}
 }
 

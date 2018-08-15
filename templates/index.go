@@ -3,9 +3,10 @@ package templates
 import "golang-todolist/frame"
 
 func init() {
-	frame.ViewMgr.Add(&frame.View{
+	frame.NewView(&frame.View{
 		Name: "index",
 		HasLayout: true,
+		// LayoutTemplateName: "layout",
 		Template: `
 <h1>Todo Lists</h1>
 
@@ -17,5 +18,5 @@ func init() {
 		<li class="list-group-item">{{.Id}} {{.Name}}</li>
 	{{end}}
 </ul>
-	`})
+`})
 }

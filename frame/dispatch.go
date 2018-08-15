@@ -3,7 +3,7 @@ package frame
 import "net/http"
 
 func Dispatch(controllerName string, actionName string) http.HandlerFunc {
-	controller, controllerExists := ControllerMap[controllerName]
+	controller, controllerExists := Registry.Controllers[controllerName]
 	if (!controllerExists) {
 		panic("Controller not set on ControllerMgr: " + controllerName)
 	}
