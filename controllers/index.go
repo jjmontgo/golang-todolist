@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"golang-todolist/templates"
 	"golang-todolist/frame"
 	"golang-todolist/model/todolist"
 	"log"
@@ -17,11 +16,13 @@ func init() {
 		if err != nil {
 			log.Fatalf("resultSet.All(): %q\n", err)
 		}
-		controller.Render("index", templates.IndexVars{todoLists, ""})
+		// controller.Render("index", templates.IndexVars{todoLists, ""})
+		controller.Render("index", map[string]interface{}{
+			"Results": todoLists,
+		})
 	}
 
 	controller.Actions["Create"] = func() {
-
 	}
 }
 

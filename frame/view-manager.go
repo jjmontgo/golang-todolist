@@ -1,8 +1,6 @@
 package frame
 
-import (
-	"html/template"
-)
+import "html/template"
 
 var ViewMgr ViewManager
 

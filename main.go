@@ -8,9 +8,11 @@ import (
 	localEnvFile "github.com/joho/godotenv"
 	// map ApiGateway to http.ResponseWriter/Request
 	lambdaGoServerAdapter "github.com/akrylysov/algnhsa"
+	_ "golang-todolist/controllers" // init all controllers
+	_ "golang-todolist/templates" // init all templates
 )
 
-func init() {
+func main() {
 	router := InitRouter()
 	// prod will not have a .env, so it can ignore errors
 	_ = localEnvFile.Load()
@@ -30,10 +32,4 @@ func init() {
 		panic("Failed to determine application mode: 'prod' or 'dev'")
 	}
 }
-
-func main() {
-}
-
-
-
 

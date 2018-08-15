@@ -1,11 +1,8 @@
 package frame
 
-import (
-	"net/http"
-	"github.com/gorilla/mux"
-)
+import "net/http"
 
-func Dispatch(router *mux.Router, controllerName string, actionName string) http.HandlerFunc {
+func Dispatch(controllerName string, actionName string) http.HandlerFunc {
 	controller, controllerExists := ControllerMap[controllerName]
 	if (!controllerExists) {
 		panic("Controller not set on ControllerMgr: " + controllerName)
@@ -15,11 +12,9 @@ func Dispatch(router *mux.Router, controllerName string, actionName string) http
 		panic("Action not set on controller '" + controllerName + "': " + actionName)
 	}
 
-	controller.Router = router
-
 	return func (w http.ResponseWriter, r *http.Request) {
-		controller.Request = r
-		controller.Response = w
+		Registry.Request = r
+		Registry.Response = w
 		action()
 	}
 }
