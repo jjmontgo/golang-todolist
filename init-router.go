@@ -9,9 +9,20 @@ import (
 func InitRouter() http.Handler {
 	r := mux.NewRouter()
 	frame.Registry.Router = r
-	r.HandleFunc("/", frame.Dispatch("IndexController", "Index")).Name("index")
-	r.HandleFunc("/todolist/create", frame.Dispatch("IndexController", "Create")).Name("todolist_create")
-	// r.HandleFunc("/todolist/{id:[0-9]+}")
+
+	r.HandleFunc("/", frame.Dispatch("Todolist", "Index")).Name("index")
+
+	r.HandleFunc("/todolist/edit", frame.Dispatch("Todolist", "Edit")).Name("todolist_edit")
+
+	r.HandleFunc("/todolist/save", frame.Dispatch("Todolist", "Save")).
+		Methods("POST").
+		Name("todolist_save")
+
+	r.HandleFunc("/todolist/delete/{id:[0-9]+}", frame.Dispatch("Todolist", "Delete")).
+		Methods("POST").
+		Name("todolist_delete")
+
 	r.HandleFunc("/test", frame.Dispatch("TestController", "Test")).Name("test")
+
 	return r
 }

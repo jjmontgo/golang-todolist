@@ -11,6 +11,7 @@ func NewView(view *View) {
 	tpl := template.New(view.Name)
 	tpl.Funcs(template.FuncMap{
 		"route": view.Route,
+		"tostring": ToString,
 	})
 	if view.LayoutTemplateName == "" {
 		view.LayoutTemplateName = "layout"
@@ -45,8 +46,9 @@ func (this *View) Render(vars interface{}) {
 	}
 }
 
-func (this *View) Route(name string) string {
-	url, err := Registry.Router.Get(name).URL()
+// remove duplication with controller
+func (this *View) Route(name string, vars ...string) string {
+	url, err := Registry.Router.Get(name).URL(vars...)
 	if (err != nil) {
 		log.Fatalf("Registry.Router.Get(name).URL(): %q\n", err)
 	}
