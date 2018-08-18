@@ -12,13 +12,15 @@ func InitRouter() http.Handler {
 
 	r.HandleFunc("/", frame.Dispatch("Todolist", "Index")).Name("index")
 
-	r.HandleFunc("/todolist/edit", frame.Dispatch("Todolist", "Edit")).Name("todolist_edit")
+	r.HandleFunc("/todolist/new", frame.Dispatch("Todolist", "Edit")).Name("todolist_new")
+
+	r.HandleFunc("/todolist/edit/{id:[0-9]+}", frame.Dispatch("Todolist", "Edit")).Name("todolist_edit")
 
 	r.HandleFunc("/todolist/save", frame.Dispatch("Todolist", "Save")).
 		Methods("POST").
 		Name("todolist_save")
 
-	r.HandleFunc("/todolist/delete/{id:[0-9]+}", frame.Dispatch("Todolist", "Delete")).
+	r.HandleFunc("/todolist/delete/{id}", frame.Dispatch("Todolist", "Delete")).
 		Methods("POST").
 		Name("todolist_delete")
 

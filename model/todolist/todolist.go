@@ -12,6 +12,19 @@ func Collection() db.Collection {
 }
 
 type Todolist struct {
-	Id int `db:"id"`
+	Id string `db:"id"`
 	Name string `db:"name"`
+}
+
+func (this *Todolist) Save() error {
+	var err error
+	var id interface{}
+	if (this.Id == "") {
+		id, err = Collection().Insert(this)
+		this.Id = frame.ToString(id)
+	} else {
+		err = Collection().Find("id", this.Id).Update(this)
+	}
+
+	return err
 }

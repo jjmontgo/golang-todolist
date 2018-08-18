@@ -13,7 +13,8 @@ func init() {
 <a href="{{route "index"}}">Back to Todo Lists</a>
 
 <form action="{{route "todolist_save"}}" method="POST">
-	<input type="text" name="name">
+	<input type="hidden" name="id" value="{{.Id}}" />
+	<input type="text" name="name" value="{{.Name}}">
 	<input type="submit" value="Save">
 </form>
 

@@ -24,12 +24,26 @@ func init() {
 	}
 
 	controller.Actions["Edit"] = func() {
-		controller.Render("todolist/edit", nil)
+		id := controller.Param("id")
+		var list *todolist.Todolist
+		// update an existing list
+		if (id != "") {
+			rs := todolist.Collection().Find("id", id)
+			err := rs.One(&list)
+			if (err != nil) {
+				log.Fatalf("rs.One(&list): %q\n", err)
+			}
+		}
+		// or create a new one
+		if (list == nil) {
+			list = &todolist.Todolist{Id: "", Name: "",}
+		}
+		controller.Render("todolist/edit", list)
 	}
 
 	controller.Actions["Save"] = func() {
-		name := controller.Param("name")
-		_, err := todolist.Collection().Insert(todolist.Todolist{Name: name})
+		list := todolist.Todolist{Id: controller.Param("id"), Name: controller.Param("name")}
+		err := list.Save()
 		if err != nil {
 			controller.Error(err.Error())
 			return
