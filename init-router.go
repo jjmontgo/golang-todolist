@@ -24,7 +24,5 @@ func InitRouter() http.Handler {
 		Methods("POST").
 		Name("todolist_delete")
 
-	r.HandleFunc("/test", frame.Dispatch("TestController", "Test")).Name("test")
-
 	return r
 }

@@ -2,8 +2,8 @@ package frame
 
 import (
 	"net/http"
-	"log"
-	"github.com/gorilla/mux"
+	"github.com/gorilla/mux" // required by controller.Param()
+	// "fmt"
 )
 
 type Controller struct {
@@ -18,18 +18,9 @@ func NewController(name string) *Controller {
 	return newController
 }
 
-func (this *Controller) Render(templateName string, vars interface{}) {
+func (this *Controller) Render(templateName string, params ...interface{}) {
 	view := Registry.Views[templateName]
-	view.Render(vars)
-}
-
-// remove duplication with frame.view
-func (this *Controller) Route(name string) string {
-	url, err := Registry.Router.Get(name).URL()
-	if (err != nil) {
-		log.Fatalf("Registry.Router.Get(name).URL(): %q\n", err)
-	}
-	return url.String()
+	view.Render(params...)
 }
 
 func (this *Controller) Redirect(url string) {

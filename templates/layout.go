@@ -16,7 +16,7 @@ func init() {
 </head>
 <body>
 	<div class="container">
-		{{.}}
+		{{.Content}}
 	</div>
 </body>
 </html>`})

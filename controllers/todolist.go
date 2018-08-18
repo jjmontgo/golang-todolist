@@ -1,34 +1,34 @@
 package controllers
 
+import "strings"
+
 import (
 	// "fmt"
 	"log"
 	"golang-todolist/frame"
-	"golang-todolist/model/todolist"
+	"golang-todolist/model"
 )
 
 func init() {
-	controller := frame.NewController("Todolist")
+	this := frame.NewController("Todolist")
 
-	controller.Actions["Index"] = func() {
-		resultSet := todolist.Collection().Find()
-		var todoLists []todolist.Todolist
+	this.Actions["Index"] = func() {
+		resultSet := model.Todolists().Find()
+		var todoLists []model.Todolist
 		err := resultSet.All(&todoLists)
 		if err != nil {
 			log.Fatalf("resultSet.All(): %q\n", err)
 		}
 
-		controller.Render("todolist/index", map[string]interface{}{
-			"Results": todoLists,
-		})
+		this.Render("todolist/index", "Results", todoLists)
 	}
 
-	controller.Actions["Edit"] = func() {
-		id := controller.Param("id")
-		var list *todolist.Todolist
+	this.Actions["Edit"] = func() {
+		id := this.Param("id")
+		var list *model.Todolist
 		// update an existing list
 		if (id != "") {
-			rs := todolist.Collection().Find("id", id)
+			rs := model.Todolists().Find("id", id)
 			err := rs.One(&list)
 			if (err != nil) {
 				log.Fatalf("rs.One(&list): %q\n", err)
@@ -36,25 +36,33 @@ func init() {
 		}
 		// or create a new one
 		if (list == nil) {
-			list = &todolist.Todolist{Id: "", Name: "",}
+			list = &model.Todolist{Id: "", Name: "",}
 		}
-		controller.Render("todolist/edit", list)
+		this.Render("todolist/edit", "List", list)
 	}
 
-	controller.Actions["Save"] = func() {
-		list := todolist.Todolist{Id: controller.Param("id"), Name: controller.Param("name")}
-		err := list.Save()
-		if err != nil {
-			controller.Error(err.Error())
+	this.Actions["Save"] = func() {
+		list := model.Todolist{Id: this.Param("id"), Name: this.Param("name")}
+		list.Name = strings.Trim(this.Param("name"), " ")
+		if list.Name == "" {
+			this.Render("todolist/edit",
+				"List", list,
+				"Error", "You must enter a name.")
 			return
 		}
-		controller.Redirect(controller.Route("index"))
+
+		err := list.Save()
+		if err != nil {
+			this.Error(err.Error())
+			return
+		}
+		this.Redirect(frame.URL("index"))
 	}
 
-	controller.Actions["Delete"] = func() {
-		id := controller.Param("id")
-		todolist.Collection().Find("id", id).Delete()
-		controller.Redirect(controller.Route("index"))
+	this.Actions["Delete"] = func() {
+		id := this.Param("id")
+		model.Todolists().Find("id", id).Delete()
+		this.Redirect(frame.URL("index"))
 	}
 }
 

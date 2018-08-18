@@ -10,11 +10,16 @@ func init() {
 		Template: `
 <h1>Edit Todolist</h1>
 
-<a href="{{route "index"}}">Back to Todo Lists</a>
+<a href="{{url "index"}}">Back to Todo Lists</a>
 
-<form action="{{route "todolist_save"}}" method="POST">
-	<input type="hidden" name="id" value="{{.Id}}" />
-	<input type="text" name="name" value="{{.Name}}">
+<form action="{{url "todolist_save"}}" method="POST">
+	<input type="hidden" name="id" value="{{.List.Id}}" />
+	<div class="form-group">
+		<input class="form-control {{if .Error}}is-invalid{{end}}" type="text" name="name" value="{{.List.Name}}">
+		{{if .Error}}
+			<div class="invalid-feedback">{{.Error}}</div>
+		{{end}}
+	</div>
 	<input type="submit" value="Save">
 </form>
 

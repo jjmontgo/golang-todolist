@@ -10,8 +10,7 @@ import (
 func NewView(view *View) {
 	tpl := template.New(view.Name)
 	tpl.Funcs(template.FuncMap{
-		"route": view.Route,
-		"tostring": ToString,
+		"url": URL, // frame/helpers.go
 	})
 	if view.LayoutTemplateName == "" {
 		view.LayoutTemplateName = "layout"
@@ -29,7 +28,20 @@ type View struct {
 	ParsedTemplate *template.Template
 }
 
-func (this *View) Render(vars interface{}) {
+func (this *View) Render(params ...interface{}) {
+	vars := make(map[string]interface{})
+	if len(params) % 2 == 0 {
+		// populate the vars map; vars[params[0]] = vars[params[1]]
+		var key string
+		for i, v := range params {
+			if i % 2 == 0 {
+				key = ToString(v) // frame/helpers.go
+			} else {
+				vars[key] = v
+			}
+		}
+	}
+
 	if this.HasLayout {
 		// buffer the template to renderedContent
 		var renderedContent bytes.Buffer
@@ -39,18 +51,9 @@ func (this *View) Render(vars interface{}) {
 		// render the content to the layout as html
 		layoutView := Registry.Views[this.LayoutTemplateName]
 		html := template.HTML(renderedContent.String())
-		layoutView.Render(html)
+		layoutView.Render("Content", html)
 	} else {
 		// render the template to the response with no layout
 		this.ParsedTemplate.Execute(Registry.Response, vars)
 	}
-}
-
-// remove duplication with controller
-func (this *View) Route(name string, vars ...string) string {
-	url, err := Registry.Router.Get(name).URL(vars...)
-	if (err != nil) {
-		log.Fatalf("Registry.Router.Get(name).URL(): %q\n", err)
-	}
-	return url.String()
 }

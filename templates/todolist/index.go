@@ -10,15 +10,15 @@ func init() {
 		Template: `
 <h1>Todo Lists</h1>
 
-<a href="{{route "todolist_new"}}">New Todolist</a>
+<a href="{{url "todolist_new"}}">New Todolist</a>
 
 <p>These are your todo lists:</p>
 <ul class="list-group">
 	{{range .Results}}
 		<li class="list-group-item">
 			{{.Id}} {{.Name}}
-			<a href="{{route "todolist_edit" "id" .Id}}">Edit</a>
-			<form method="POST" action="{{route "todolist_delete" "id" .Id}}">
+			<a href="{{url "todolist_edit" "id" .Id}}">Edit</a>
+			<form method="POST" action="{{url "todolist_delete" "id" .Id}}">
 				<button type="submit" onclick="return confirm('Are you sure')">Delete</button>
 			</form>
 		</li>
