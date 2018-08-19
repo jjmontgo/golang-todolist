@@ -51,7 +51,7 @@ func init() {
 			return
 		}
 
-		err := list.Save()
+		err := frame.SaveRecord(&list)
 		if err != nil {
 			this.Error(err.Error())
 			return
