@@ -16,6 +16,9 @@ func init() {
 		if (err != nil) {
 			log.Fatalf("rs.One(&list): %q\n", err)
 		}
-		this.Render("todo/index", "List", list)
+
+		todos := list.GetTodos()
+
+		this.Render("todo/index", "List", list, "Todos", todos)
 	}
 }

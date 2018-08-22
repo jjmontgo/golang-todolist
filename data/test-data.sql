@@ -5,7 +5,7 @@ INSERT INTO todo_list (name) VALUES
 
 INSERT INTO todo (todo_list_id, name) VALUES
 	(1, 'Brush Teeth'),
-	(1, 'Walk the Dog'),
+	(1, 'Do the Laundry'),
 	(1, 'Take out the Trash'),
 	(2, 'Water the Vines'),
 	(2, 'Listen to Matt'),
