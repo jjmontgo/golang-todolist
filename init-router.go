@@ -26,5 +26,17 @@ func InitRouter() http.Handler {
 
 	r.HandleFunc("/todolist/{id:[0-9]+}", frame.Dispatch("Todo", "Index")).Name("todolist")
 
+	r.HandleFunc("/todo/new/{todo_list_id:[0-9]+}", frame.Dispatch("Todo", "Edit")).Name("todo_new")
+
+	r.HandleFunc("/todo/edit/{id:[0-9]+}", frame.Dispatch("Todo", "Edit")).Name("todo_edit")
+
+	r.HandleFunc("/todo/save", frame.Dispatch("Todo", "Save")).
+		Methods("POST").
+		Name("todo_save")
+
+	r.HandleFunc("/todo/delete/{id:[0-9]+}", frame.Dispatch("Todo", "Delete")).
+		Methods("POST").
+		Name("todo_delete")
+
 	return r
 }

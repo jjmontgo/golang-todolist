@@ -27,7 +27,7 @@ func init() {
 		id := this.Param("id")
 		var list *model.Todolist
 		// update an existing list
-		if (id != "") {
+		if id != "" {
 			rs := model.Todolists().Find("id", id)
 			err := rs.One(&list)
 			if (err != nil) {
@@ -35,7 +35,7 @@ func init() {
 			}
 		}
 		// or create a new one
-		if (list == nil) {
+		if list == nil {
 			list = &model.Todolist{Id: "", Name: "",}
 		}
 		this.Render("todolist/edit", "List", list)
