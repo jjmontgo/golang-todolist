@@ -11,12 +11,7 @@ func init() {
 	this := frame.NewController("Todo")
 
 	this.Actions["Index"] = func() {
-		rs := model.Todolists().Find("id", this.Param("id"))
-		var list *model.Todolist
-		err := rs.One(&list)
-		if (err != nil) {
-			log.Fatalf("rs.One(&list): %q\n", err)
-		}
+		list := model.FindTodolist("id", this.Param("id"))
 		todos := list.GetTodos()
 		this.Render(
 			"todo/index",
@@ -32,24 +27,13 @@ func init() {
 		// or editing an existing todo
 		if todoListId == "" {
 			id := this.Param("id") // route "todo_edit"
-			rs := model.Todos().Find("id", id)
-			err := rs.One(&todo)
-			if (err != nil) {
-				log.Fatalf("rs.One(&todo): %q\n", err)
-			}	else {
-				todoListId = todo.TodoListId
-			}
-		}
-		if todo == nil {
+			todo = model.FindTodo("id", id)
+			todoListId = todo.TodoListId
+		} else {
 			todo = &model.Todo{Id: "", Name: "", TodoListId: todoListId,}
 		}
 
-		var list *model.Todolist
-		rs := model.Todolists().Find("id", todoListId)
-		err := rs.One(&list)
-		if (err != nil) {
-			log.Fatalf("rs.One(&list): %q\n", err)
-		}
+		list := model.FindTodolist("id", todoListId)
 
 		this.Render("todo/edit",
 			"Todo", todo,
@@ -57,12 +41,7 @@ func init() {
 	}
 
 	this.Actions["Save"] = func() {
-		var list *model.Todolist
-		rs := model.Todolists().Find("id", this.Param("todo_list_id"))
-		err := rs.One(&list)
-		if (err != nil) {
-			log.Fatalf("rs.One(&list): %q\n", err)
-		}
+		list := model.FindTodolist("id", this.Param("todo_list_id"))
 
 		todo := model.Todo{
 			Id: this.Param("id"),
@@ -78,7 +57,7 @@ func init() {
 			return
 		}
 
-		err = frame.SaveRecord(&todo)
+		err := frame.SaveRecord(&todo)
 		if err != nil {
 			this.Error(err.Error())
 			return

@@ -4,7 +4,7 @@ import "strings"
 
 import (
 	// "fmt"
-	"log"
+	// "log"
 	"golang-todolist/frame"
 	"golang-todolist/model"
 )
@@ -13,13 +13,7 @@ func init() {
 	this := frame.NewController("Todolist")
 
 	this.Actions["Index"] = func() {
-		resultSet := model.Todolists().Find()
-		var todoLists []model.Todolist
-		err := resultSet.All(&todoLists)
-		if err != nil {
-			log.Fatalf("resultSet.All(): %q\n", err)
-		}
-
+		todoLists := model.FindTodolists()
 		this.Render("todolist/index", "Results", todoLists)
 	}
 
@@ -28,11 +22,7 @@ func init() {
 		var list *model.Todolist
 		// update an existing list
 		if id != "" {
-			rs := model.Todolists().Find("id", id)
-			err := rs.One(&list)
-			if (err != nil) {
-				log.Fatalf("rs.One(&list): %q\n", err)
-			}
+			list = model.FindTodolist("id", id)
 		}
 		// or create a new one
 		if list == nil {
@@ -62,6 +52,7 @@ func init() {
 	this.Actions["Delete"] = func() {
 		id := this.Param("id")
 		model.Todolists().Find("id", id).Delete()
+		model.Todos().Find("todo_list_id", id).Delete()
 		this.Redirect(frame.URL("index"))
 	}
 }
