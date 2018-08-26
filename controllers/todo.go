@@ -3,7 +3,7 @@ package controllers
 import (
 	"golang-todolist/frame"
 	"golang-todolist/model"
-	"log"
+	// "log"
 	"strings"
 )
 
@@ -66,14 +66,8 @@ func init() {
 	}
 
 	this.Actions["Delete"] = func() {
-		var todo *model.Todo
-		id := this.Param("id")
-		rs := model.Todos().Find("id", id)
-		err := rs.One(&todo)
-		if (err != nil) {
-			log.Fatalf("rs.One(&todo): %q\n", err)
-		}
-		rs.Delete()
+		todo := model.FindTodo("id", this.Param("id"))
+		frame.DeleteRecord(todo)
 		this.Redirect(frame.URL("todolist", "id", todo.TodoListId))
 	}
 }

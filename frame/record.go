@@ -2,6 +2,7 @@ package frame
 
 import "upper.io/db.v2" // required for db.Collection
 
+// the primary key is expected to be named "id" across all tables
 type Record interface {
 	PrimaryKey() string
 	SetPrimaryKey(string)
@@ -20,4 +21,8 @@ func SaveRecord(record Record) error {
 		err = collection.Find("id", primaryKey).Update(record)
 	}
 	return err
+}
+
+func DeleteRecord(record Record) {
+	record.Collection().Find("id", record.PrimaryKey()).Delete()
 }

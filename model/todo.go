@@ -41,3 +41,4 @@ func (this *Todo) SetPrimaryKey(id string) {
 func (this *Todo) Collection() db.Collection {
 	return Todos()
 }
+

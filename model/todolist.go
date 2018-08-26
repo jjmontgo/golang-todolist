@@ -51,6 +51,11 @@ func (this *Todolist) Collection() db.Collection {
 	return Todolists()
 }
 
+func (this *Todolist) Delete() {
+	Todos().Find("todo_list_id", this.Id).Delete()
+	frame.DeleteRecord(this)
+}
+
 func (this *Todolist) GetTodos() []*Todo {
 	rs := Todos().Find("todo_list_id", this.Id)
 	var todos []*Todo

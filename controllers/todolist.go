@@ -51,8 +51,8 @@ func init() {
 
 	this.Actions["Delete"] = func() {
 		id := this.Param("id")
-		model.Todolists().Find("id", id).Delete()
-		model.Todos().Find("todo_list_id", id).Delete()
+		todolist := model.FindTodolist("id", id)
+		todolist.Delete()
 		this.Redirect(frame.URL("index"))
 	}
 }
