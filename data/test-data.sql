@@ -11,3 +11,7 @@ INSERT INTO todo (todo_list_id, name) VALUES
 	(2, 'Listen to Matt'),
 	(2, 'Nod at Will')
 ;
+
+INSERT INTO user(username, email, password_hash) VALUES
+	('jonathan', 'jjmontgo@gmail.com', '')
+;

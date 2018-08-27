@@ -38,5 +38,19 @@ func InitRouter() http.Handler {
 		Methods("POST").
 		Name("todo_delete")
 
+	r.HandleFunc("/users", frame.Dispatch("User", "Index")).Name("users")
+
+	r.HandleFunc("/user/new", frame.Dispatch("User", "Edit")).Name("user_new")
+
+	r.HandleFunc("/user/edit/{id:[0-9]+}", frame.Dispatch("User", "Edit")).Name("user_edit")
+
+	r.HandleFunc("/user/save", frame.Dispatch("User", "Save")).
+		Methods("POST").
+		Name("user_save")
+
+	r.HandleFunc("/user/delete/{id:[0-9]+}", frame.Dispatch("User", "Delete")).
+		Methods("POST").
+		Name("user_delete")
+
 	return r
 }
