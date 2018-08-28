@@ -26,9 +26,23 @@ func init() {
 	}
 
 	this.Actions["Save"] = func() {
-		user := model.User{Id: this.Param("id"), Username: this.Param("username"), Email: this.Param("email"),}
+		var user *model.User
+		id := this.Param("id")
+		if id == "" {
+			user = &model.User{
+				Id: this.Param("id"),
+				Username: this.Param("username"),
+				Email: this.Param("email")}
+		} else {
+			user = model.FindUser("id", id)
+			user.Username = this.Param("username")
+			user.Email = this.Param("email")
+		}
 		// todo: validation
-		err := frame.SaveRecord(&user)
+		if this.Param("password") != "" {
+			user.PasswordHash = frame.HashPassword(this.Param("password"))
+		}
+		err := frame.SaveRecord(user)
 		if err != nil {
 			this.Error(err.Error())
 			return

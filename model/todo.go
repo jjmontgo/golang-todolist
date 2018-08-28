@@ -1,7 +1,6 @@
 package model
 
 import (
-	"log"
 	"upper.io/db.v2" // required for db.Collection
 	"golang-todolist/frame"
 )
@@ -11,7 +10,7 @@ func FindTodo(searchParams ...interface{}) *Todo {
 	rs := Todos().Find(searchParams...)
 	err := rs.One(&todo)
 	if (err != nil) {
-		log.Fatalf("rs.One(&todo): %q\n", err)
+		return nil
 	}
 	return todo
 }

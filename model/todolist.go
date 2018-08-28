@@ -21,7 +21,7 @@ func FindTodolist(searchParams ...interface{}) *Todolist {
 	rs := Todolists().Find(searchParams...)
 	err := rs.One(&todoList)
 	if (err != nil) {
-		log.Fatalf("rs.One(&list): %q\n", err)
+		return nil
 	}
 	return todoList
 }

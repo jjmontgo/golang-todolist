@@ -52,5 +52,13 @@ func InitRouter() http.Handler {
 		Methods("POST").
 		Name("user_delete")
 
+	r.HandleFunc("/login", frame.Dispatch("Auth", "Login")).
+		Methods("GET").
+		Name("login")
+
+	r.HandleFunc("/login", frame.Dispatch("Auth", "ValidateLogin")).
+		Methods("POST").
+		Name("login_validate")
+
 	return r
 }

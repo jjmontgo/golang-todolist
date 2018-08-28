@@ -21,7 +21,7 @@ func FindUser(searchParams ...interface{}) *User {
 	rs := Users().Find(searchParams...)
 	err := rs.One(&user)
 	if (err != nil) {
-		log.Fatalf("rs.One(&user): %q\n", err)
+		return nil
 	}
 	return user
 }
