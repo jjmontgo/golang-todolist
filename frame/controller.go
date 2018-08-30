@@ -24,7 +24,7 @@ func (this *Controller) Render(templateName string, params ...interface{}) {
 }
 
 func (this *Controller) Redirect(url string) {
-	http.Redirect(Registry.Response, Registry.Request, url, 301)
+	http.Redirect(Registry.Response, Registry.Request, url, 302)
 }
 
 func (this *Controller) Param(name string) string {

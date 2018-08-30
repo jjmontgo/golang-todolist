@@ -9,7 +9,12 @@ func init() {
 	this := frame.NewController("Auth")
 
 	this.Actions["Login"] = func() {
-		this.Render("auth/login")
+		if frame.UserIsLoggedIn() {
+			this.Redirect(frame.URL("index"))
+			return
+		}
+
+		this.Render("auth/login", "Username", frame.SessionGet("username"))
 	}
 
 	this.Actions["ValidateLogin"] = func() {
@@ -28,6 +33,9 @@ func init() {
 				isValidPassword := frame.VerifyPassword(this.Param("password"), user.PasswordHash)
 				if !isValidPassword {
 					isError = true
+				} else {
+					frame.SessionSet("username", user.Username)
+					this.Redirect(frame.URL("index"))
 				}
 			}
 		}
@@ -36,6 +44,13 @@ func init() {
 			errorMessage = "Invalid username or password"
 		}
 
-		this.Render("auth/login", "Error", errorMessage)
+		this.Render("auth/login",
+			"Error", errorMessage,
+			"Username", frame.SessionGet("username"))
+	}
+
+	this.Actions["Logout"] = func() {
+		frame.SessionSet("username", "")
+		this.Redirect(frame.URL("login"))
 	}
 }

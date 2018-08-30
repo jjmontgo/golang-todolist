@@ -8,7 +8,7 @@ import (
 )
 
 var Db sqlbuilder.Database
-var err error
+var dbErr error
 var dbInitialized bool
 
 func DB() sqlbuilder.Database {
@@ -22,9 +22,9 @@ func DB() sqlbuilder.Database {
 		Password: os.Getenv("MYSQL_PASSWORD"),
 		Database: os.Getenv("MYSQL_DB")}
 
-	Db, err = mysql.Open(settings)
-	if err != nil {
-		log.Fatalf("db.Open(): %q\n", err)
+	Db, dbErr = mysql.Open(settings)
+	if dbErr != nil {
+		log.Fatalf("db.Open(): %q\n", dbErr)
 	}
 
 	return Db

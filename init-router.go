@@ -60,5 +60,7 @@ func InitRouter() http.Handler {
 		Methods("POST").
 		Name("login_validate")
 
+	r.HandleFunc("/logout", frame.Dispatch("Auth", "Logout")).Name("logout")
+
 	return r
 }

@@ -47,3 +47,5 @@ And run it locally:
 	Used for improved routing.
 * upper.io/db.v2/mysql
 	Used as data access layer.
+* https://github.com/srinathgs/mysqlstore
+	Gorilla's Session Store Implementation for MySQL

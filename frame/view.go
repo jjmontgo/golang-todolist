@@ -11,6 +11,7 @@ func NewView(view *View) {
 	tpl := template.New(view.Name)
 	tpl.Funcs(template.FuncMap{
 		"url": URL, // frame/helpers.go
+		"user_is_logged_in": UserIsLoggedIn, // frame/auth.go
 	})
 	if view.LayoutTemplateName == "" {
 		view.LayoutTemplateName = "layout"

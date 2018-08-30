@@ -10,6 +10,10 @@ func init() {
 		Template: `
 <h1>Login</h1>
 
+{{if .Username}}
+	<p>{{.Username}}</p>
+{{end}}
+
 <form action="{{url "login_validate"}}" method="POST">
 	{{if .Error}}
 		<p>{{.Error}}</p>
