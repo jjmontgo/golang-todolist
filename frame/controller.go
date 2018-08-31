@@ -9,11 +9,15 @@ import (
 type Controller struct {
 	Name string
 	Actions map[string]func()
+	IsAccessible func(string) bool
 }
 
 func NewController(name string) *Controller {
 	newController := &Controller{Name: name}
 	newController.Actions = make(map[string]func())
+	// full access by default
+	newController.IsAccessible = func(actionName string) bool { return true }
+
 	Registry.Controllers[name] = newController
 	return newController
 }

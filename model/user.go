@@ -1,10 +1,26 @@
 package model
 
 import (
+	"encoding/gob"
 	"log"
 	"upper.io/db.v2" // required for db.Collection
 	"golang-todolist/frame"
 )
+
+func init() {
+	// allow model.User struct to be stored in session
+	gob.Register(&User{})
+}
+
+func GetUserFromSession() *User {
+	val := frame.SessionGetVar("user")
+	var user = &User{}
+	var ok bool
+	if user, ok = val.(*User); !ok {
+		return nil
+	}
+	return user
+}
 
 func FindUsers(searchParams ...interface{}) []User {
 	resultSet := Users().Find(searchParams...)

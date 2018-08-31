@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"github.com/srinathgs/mysqlstore"
+	// "golang-todolist/model"
 )
 
 var SessionStore *mysqlstore.MySQLStore
@@ -32,19 +33,32 @@ func GetSessionStore() *mysqlstore.MySQLStore {
 	return SessionStore
 }
 
-func SessionSet(field string, value interface{}) {
+func SessionSetVar(field string, value interface{}) {
 	session, err := GetSessionStore().Get(Registry.Request, os.Getenv("SESSION_NAME"))
 	session.Values[field] = value
 	err = session.Save(Registry.Request, Registry.Response)
 	if err != nil {
-		log.Fatalf("SessionSet(): %q\n", err)
+		log.Fatalf("SessionSetVar(): %q\n", err)
 	}
 }
 
-func SessionGet(field string) interface{} {
+func SessionGetVar(field string) interface{} {
 	session, err := GetSessionStore().Get(Registry.Request, os.Getenv("SESSION_NAME"))
 	if err != nil {
-		log.Fatalf("SessionGet(): %q\n", err)
+		log.Fatalf("SessionGetVar(): %q\n", err)
 	}
 	return session.Values[field]
+}
+
+// func SessionGetUser() *model.User {
+// 	val := SessionGetVar("user")
+// 	var user = &model.User{}
+// 	if user, ok := val.(*model.User); !ok {
+// 		return nil
+// 	}
+// 	return user
+// }
+
+func UserIsLoggedIn() bool {
+	return SessionGetVar("user") != nil
 }

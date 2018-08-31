@@ -14,7 +14,7 @@ func init() {
 			return
 		}
 
-		this.Render("auth/login", "Username", frame.SessionGet("username"))
+		this.Render("auth/login")
 	}
 
 	this.Actions["ValidateLogin"] = func() {
@@ -34,7 +34,7 @@ func init() {
 				if !isValidPassword {
 					isError = true
 				} else {
-					frame.SessionSet("username", user.Username)
+					frame.SessionSetVar("user", user)
 					this.Redirect(frame.URL("index"))
 				}
 			}
@@ -44,13 +44,11 @@ func init() {
 			errorMessage = "Invalid username or password"
 		}
 
-		this.Render("auth/login",
-			"Error", errorMessage,
-			"Username", frame.SessionGet("username"))
+		this.Render("auth/login",	"Error", errorMessage)
 	}
 
 	this.Actions["Logout"] = func() {
-		frame.SessionSet("username", "")
+		frame.SessionSetVar("user", nil)
 		this.Redirect(frame.URL("login"))
 	}
 }

@@ -3,7 +3,6 @@ package controllers
 import "strings"
 
 import (
-	// "fmt"
 	// "log"
 	"golang-todolist/frame"
 	"golang-todolist/model"
@@ -11,6 +10,10 @@ import (
 
 func init() {
 	this := frame.NewController("Todolist")
+
+	this.IsAccessible = func(actionName string) bool {
+		return frame.UserIsLoggedIn()
+	}
 
 	this.Actions["Index"] = func() {
 		todoLists := model.FindTodolists()
