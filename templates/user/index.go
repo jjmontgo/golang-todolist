@@ -24,8 +24,9 @@ func init() {
 			<td>{{.Username}}</td>
 			<td>{{.Email}}</td>
 			<td>
-				<form method="POST" action="{{url "user_delete" "id" .Id}}">
-					<a class="btn btn-secondary" href="{{url "user_edit" "id" .Id}}">Edit</a>
+				{{$id := uint_to_string .Id}}
+				<form method="POST" action="{{url "user_delete" "id" $id}}">
+					<a class="btn btn-secondary" href="{{url "user_edit" "id" $id}}">Edit</a>
 					<button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure')">Delete</button>
 				</form>
 			</td>

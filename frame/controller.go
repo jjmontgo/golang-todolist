@@ -3,7 +3,7 @@ package frame
 import (
 	"net/http"
 	"github.com/gorilla/mux" // required by controller.Param()
-	// "fmt"
+	"log"
 )
 
 type Controller struct {
@@ -13,6 +13,10 @@ type Controller struct {
 }
 
 func NewController(name string) *Controller {
+	if c, ok := Registry.Controllers[name]; ok {
+		panic("NewController(): The controller named '" + c.Name + "' already exists");
+	}
+
 	newController := &Controller{Name: name}
 	newController.Actions = make(map[string]func())
 	// full access by default
@@ -42,6 +46,7 @@ func (this *Controller) Param(name string) string {
 	return param
 }
 
-func (this *Controller) Error(errorMessage string) {
-	http.Error(Registry.Response, errorMessage, 500)
+func (this *Controller) Error(error error) {
+	http.Error(Registry.Response, error.Error(), 500)
+	log.Fatal(error)
 }

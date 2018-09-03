@@ -23,14 +23,13 @@ func init() {
 	this.Actions["Edit"] = func() {
 		var todo *model.Todo
 		// creating a new todo
-		todoListId := this.Param("todo_list_id") // route "todo_new"
+		todoListId := frame.StringToUint(this.Param("todo_list_id"))
 		// or editing an existing todo
-		if todoListId == "" {
-			id := this.Param("id") // route "todo_edit"
-			todo = model.FindTodo("id", id)
+		if todoListId == 0 {
+			todo = model.FindTodo("id", this.Param("id"))
 			todoListId = todo.TodoListId
 		} else {
-			todo = &model.Todo{Id: "", Name: "", TodoListId: todoListId,}
+			todo = &model.Todo{Name: "", TodoListId: todoListId,}
 		}
 
 		list := model.FindTodolist("id", todoListId)
@@ -44,7 +43,7 @@ func init() {
 		list := model.FindTodolist("id", this.Param("todo_list_id"))
 
 		todo := model.Todo{
-			Id: this.Param("id"),
+			Id: frame.StringToUint(this.Param("id")),
 			Name: strings.Trim(this.Param("name"), " "),
 			TodoListId: list.Id,
 		}
@@ -59,15 +58,15 @@ func init() {
 
 		err := frame.SaveRecord(&todo)
 		if err != nil {
-			this.Error(err.Error())
+			this.Error(err)
 			return
 		}
-		this.Redirect(frame.URL("todolist", "id", list.Id))
+		this.Redirect(frame.URL("todolist", "id", frame.UintToString(list.Id)))
 	}
 
 	this.Actions["Delete"] = func() {
 		todo := model.FindTodo("id", this.Param("id"))
 		frame.DeleteRecord(todo)
-		this.Redirect(frame.URL("todolist", "id", todo.TodoListId))
+		this.Redirect(frame.URL("todolist", "id", frame.UintToString(todo.TodoListId)))
 	}
 }

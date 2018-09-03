@@ -10,7 +10,8 @@ func init() {
 		Template: `
 <h1>Edit Todo</h1>
 
-<a href="{{url "todolist" "id" .List.Id}}">Back to Todo List</a>
+{{$list_id := uint_to_string .List.Id}}
+<a href="{{url "todolist" "id" $list_id}}">Back to Todo List</a>
 
 <form action="{{url "todo_save"}}" method="POST">
 	<input type="hidden" name="id" value="{{.Todo.Id}}" />

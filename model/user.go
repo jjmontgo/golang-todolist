@@ -48,19 +48,19 @@ func Users() db.Collection {
 
 // implements frame.Record
 type User struct {
-	Id string `db:"id"`
+	Id uint `db:"id"`
 	Username string `db:"username"`
 	Email string `db:"email"`
 	PasswordHash string `db:"password_hash"`
 }
 
 // frame.Record interface
-func (this *User) PrimaryKey() string {
+func (this *User) PrimaryKey() uint {
 	return this.Id
 }
 
 // frame.Record interface
-func (this *User) SetPrimaryKey(id string) {
+func (this *User) SetPrimaryKey(id uint) {
 	this.Id = id
 }
 

@@ -21,18 +21,18 @@ func Todos() db.Collection {
 
 // implements frame.Record
 type Todo struct {
-	Id string `db:"id"`
+	Id uint `db:"id"`
 	Name string `db:"name"`
-	TodoListId string `db:"todo_list_id"`
+	TodoListId uint `db:"todo_list_id"`
 }
 
 // frame.Record interface
-func (this *Todo) PrimaryKey() string {
+func (this *Todo) PrimaryKey() uint {
 	return this.Id
 }
 
 // frame.Record interface
-func (this *Todo) SetPrimaryKey(id string) {
+func (this *Todo) SetPrimaryKey(id uint) {
 	this.Id = id
 }
 

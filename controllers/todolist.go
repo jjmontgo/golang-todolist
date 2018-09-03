@@ -1,11 +1,11 @@
 package controllers
 
-import "strings"
 
 import (
 	// "log"
 	"golang-todolist/frame"
 	"golang-todolist/model"
+	"strings"
 )
 
 func init() {
@@ -21,21 +21,21 @@ func init() {
 	}
 
 	this.Actions["Edit"] = func() {
-		id := this.Param("id")
+		id := frame.StringToUint(this.Param("id"))
 		var list *model.Todolist
 		// update an existing list
-		if id != "" {
+		if id != 0 {
 			list = model.FindTodolist("id", id)
 		}
 		// or create a new one
 		if list == nil {
-			list = &model.Todolist{Id: "", Name: "",}
+			list = &model.Todolist{Name: "",}
 		}
 		this.Render("todolist/edit", "List", list)
 	}
 
 	this.Actions["Save"] = func() {
-		list := model.Todolist{Id: this.Param("id"), Name: this.Param("name")}
+		list := model.Todolist{Id: frame.StringToUint(this.Param("id")), Name: this.Param("name")}
 		list.Name = strings.Trim(this.Param("name"), " ")
 		if list.Name == "" {
 			this.Render("todolist/edit",
@@ -46,14 +46,14 @@ func init() {
 
 		err := frame.SaveRecord(&list)
 		if err != nil {
-			this.Error(err.Error())
+			this.Error(err)
 			return
 		}
 		this.Redirect(frame.URL("index"))
 	}
 
 	this.Actions["Delete"] = func() {
-		id := this.Param("id")
+		id := frame.StringToUint(this.Param("id"))
 		todolist := model.FindTodolist("id", id)
 		todolist.Delete()
 		this.Redirect(frame.URL("index"))

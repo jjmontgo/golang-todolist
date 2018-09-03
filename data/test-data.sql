@@ -13,5 +13,5 @@ INSERT INTO todo (todo_list_id, name) VALUES
 ;
 
 INSERT INTO user(username, email, password_hash) VALUES
-	('jonathan', 'jjmontgo@gmail.com', '')
+	('jonathan', 'jjmontgo@gmail.com', '$2a$10$lschprsnzjE72bINba99h.HnQOSDbdiD8VpCQC8xiwKWO7eW0FlIO')
 ;

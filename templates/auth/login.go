@@ -24,7 +24,7 @@ func init() {
 	</div>
 	<div class="form-group">
 		<label for="password">Password</label>
-		<input class="form-control" type="text" id="password" name="password" value="">
+		<input class="form-control" type="password" id="password" name="password" value="">
 	</div>
 	<input type="submit" value="Login">
 </form>

@@ -13,10 +13,10 @@ import (
 )
 
 func main() {
-	router := InitRouter()
 	// prod will not have a .env, so it can ignore errors
 	_ = localEnvFile.Load()
 	mode := os.Getenv("MODE")
+	router := InitRouter()
 	if mode == "prod" {
 		// running lambda from api gateway
 		lambdaGoServerAdapter.ListenAndServe(router, nil)

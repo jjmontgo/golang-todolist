@@ -32,17 +32,17 @@ func Todolists() db.Collection {
 
 // implements frame.Record
 type Todolist struct {
-	Id string `db:"id"`
+	Id uint `db:"id"`
 	Name string `db:"name"`
 }
 
 // frame.Record interface
-func (this *Todolist) PrimaryKey() string {
+func (this *Todolist) PrimaryKey() uint {
 	return this.Id
 }
 
 // frame.Record interface
-func (this *Todolist) SetPrimaryKey(id string) {
+func (this *Todolist) SetPrimaryKey(id uint) {
 	this.Id = id
 }
 

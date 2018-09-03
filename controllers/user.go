@@ -20,7 +20,7 @@ func init() {
 			user = model.FindUser("id", id)
 		}
 		if user == nil {
-			user = &model.User{Id: "", Username: "", Email: ""}
+			user = &model.User{Username: "", Email: ""}
 		}
 		this.Render("user/edit", "User", user)
 	}
@@ -28,9 +28,8 @@ func init() {
 	this.Actions["Save"] = func() {
 		var user *model.User
 		id := this.Param("id")
-		if id == "" {
+		if id == "0" {
 			user = &model.User{
-				Id: this.Param("id"),
 				Username: this.Param("username"),
 				Email: this.Param("email")}
 		} else {
@@ -44,7 +43,7 @@ func init() {
 		}
 		err := frame.SaveRecord(user)
 		if err != nil {
-			this.Error(err.Error())
+			this.Error(err)
 			return
 		}
 		this.Redirect(frame.URL("users"))

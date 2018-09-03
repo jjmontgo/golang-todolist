@@ -12,6 +12,8 @@ func NewView(view *View) {
 	tpl.Funcs(template.FuncMap{
 		"url": URL, // frame/helpers.go
 		"user_is_logged_in": UserIsLoggedIn, // frame/auth.go
+		"to_string": ToString, // frame/helpers.go
+		"uint_to_string": UintToString,
 	})
 	if view.LayoutTemplateName == "" {
 		view.LayoutTemplateName = "layout"

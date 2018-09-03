@@ -3,8 +3,8 @@ package frame
 import (
 	"upper.io/db.v2/mysql"
 	"upper.io/db.v2/lib/sqlbuilder"
-	"os"
 	"log"
+	"os"
 )
 
 var Db sqlbuilder.Database
@@ -24,7 +24,8 @@ func DB() sqlbuilder.Database {
 
 	Db, dbErr = mysql.Open(settings)
 	if dbErr != nil {
-		log.Fatalf("db.Open(): %q\n", dbErr)
+		log.Fatalf("DB(): %q", dbErr)
+		return nil
 	}
 
 	return Db
