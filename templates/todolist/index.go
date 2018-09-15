@@ -21,6 +21,7 @@ func init() {
 			<form method="POST" action="{{url "todolist_delete" "id" $id}}">
 				<a class="btn btn-secondary" href="{{url "todolist" "id" $id}}">Open</a>
 				<a class="btn btn-secondary" href="{{url "todolist_edit" "id" $id}}">Edit</a>
+				<a class="btn btn-secondary" href="{{url "todolist_email" "id" $id}}">Email</a>
 				<button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure')">Delete</button>
 			</form>
 		</li>

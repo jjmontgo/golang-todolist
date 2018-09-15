@@ -1,9 +1,9 @@
 package frame
 
 import (
+	"log"
 	"net/http"
 	"github.com/gorilla/mux" // required by controller.Param()
-	"log"
 )
 
 type Controller struct {
@@ -49,4 +49,9 @@ func (this *Controller) Param(name string) string {
 func (this *Controller) Error(error error) {
 	http.Error(Registry.Response, error.Error(), 500)
 	log.Fatal(error)
+}
+
+func (this *Controller) Email(to string, subject string, body string, from string) {
+	log.Print("Called controller email function")
+	Email(to, subject, body, from)
 }

@@ -15,6 +15,19 @@ func URL(name string, vars ...string) string {
 	return apiGatewayPathPrefix + url.String()
 }
 
+func AbsoluteURL(name string, vars ...string) string {
+	relativeURL := URL(name, vars...)
+	var httpOrHttps string
+	isUsingTLS := Registry.Request.TLS != nil
+	isProxiedHttps := Registry.Request.Header.Get("X-Forwarded-Proto") == "https"
+	if isUsingTLS || isProxiedHttps {
+		httpOrHttps = "https://"
+	} else {
+		httpOrHttps = "http://"
+	}
+	return httpOrHttps + Registry.Request.Host + relativeURL
+}
+
 func ToString(value interface{}) string {
 	switch v := value.(type) {
 	case string:

@@ -20,9 +20,19 @@ func InitRouter() http.Handler {
 		Methods("POST").
 		Name("todolist_save")
 
+	r.HandleFunc("/todolist/image-form/{id:[0-9]+}", frame.Dispatch("Todolist", "ImageForm")).Name("todolist_image_form")
+
 	r.HandleFunc("/todolist/delete/{id}", frame.Dispatch("Todolist", "Delete")).
 		Methods("POST").
 		Name("todolist_delete")
+
+	r.HandleFunc("/todolist/email/{id}", frame.Dispatch("Todolist", "Email")).
+		Methods("GET").
+		Name("todolist_email")
+
+	r.HandleFunc("/todolist/email/{id}", frame.Dispatch("Todolist", "SendEmail")).
+		Methods("POST").
+		Name("todolist_send_email")
 
 	r.HandleFunc("/todolist/{id:[0-9]+}", frame.Dispatch("Todo", "Index")).Name("todolist")
 
