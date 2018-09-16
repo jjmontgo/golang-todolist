@@ -3,7 +3,10 @@ package controllers
 import (
 	// "fmt"
 	// "log"
+	"crypto/hmac"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"os"
 	"strings"
 	"time"
@@ -57,16 +60,15 @@ func init() {
 
 	this.Actions["ImageForm"] = func() {
 		awsUploadBucketName := os.Getenv("AWS_UPLOAD_BUCKET_NAME")
-		awsUploadURL := "http://" + awsUploadBucketName + ".s3.amazonaws.com/"
+		awsUploadURL := "https://" + awsUploadBucketName + ".s3.amazonaws.com/"
 
 		xAmzAlgorithm := "AWS4-HMAC-SHA256"
 
-		successActionStatus := "204"
+		successActionStatus := "201"
 		successActionRedirect := frame.AbsoluteURL("index")
 
 		currentTime := time.Now()
 		date := currentTime.Format("2006") + currentTime.Format("01") + currentTime.Format("02")
-		// xAmzDate := currentTime.UTC().Format(time.RFC3339)
 		xAmzDate := date + "T000000Z"
 
 		awsAccessKeyId := os.Getenv("AWS_ACCESS_KEY_ID")
@@ -78,8 +80,8 @@ func init() {
 				"\"conditions\": [" +
 					"{\"bucket\": \"" + awsUploadBucketName + "\" }," +
 					"[\"starts-with\", \"$key\", \"\"]," +
-					"{\"success-action-status\": \"" + successActionStatus + "\"}," +
-					"{\"success-action-redirect\": \"" + successActionRedirect + "\"}," +
+					"{\"success_action_status\": \"" + successActionStatus + "\"}," +
+					"{\"success_action_redirect\": \"" + successActionRedirect + "\"}," +
 					"{\"x-amz-algorithm\": \"" + xAmzAlgorithm + "\"}," +
 					"{\"x-amz-credential\": \"" + xAmzCredential + "\"}," +
 					"{\"x-amz-date\": \"" + xAmzDate + "\"}," +
@@ -87,7 +89,28 @@ func init() {
 			"}"
 		policy = base64.StdEncoding.EncodeToString([]byte(policy))
 
-		xAmzSignature := ""
+		awsSecretAccessKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
+
+		dateKey := hmac.New(sha256.New, []byte("AWS4" + awsSecretAccessKey))
+		dateKey.Write([]byte(date))
+		dateKeyHmac := dateKey.Sum(nil)
+
+		dateRegionKey := hmac.New(sha256.New, []byte(dateKeyHmac))
+		dateRegionKey.Write([]byte(awsRegion))
+		dateRegionKeyHmac := dateRegionKey.Sum(nil)
+
+		dateRegionServiceKey := hmac.New(sha256.New, []byte(dateRegionKeyHmac))
+		dateRegionServiceKey.Write([]byte("s3"))
+		dateRegionServiceKeyHmac := dateRegionServiceKey.Sum(nil)
+
+		signingKey := hmac.New(sha256.New, []byte(dateRegionServiceKeyHmac))
+		signingKey.Write([]byte("aws4_request"))
+		signingKeyHmac := signingKey.Sum(nil)
+
+		signatureHmac := hmac.New(sha256.New, []byte(signingKeyHmac))
+		signatureHmac.Write([]byte(policy))
+		xAmzSignature := hex.EncodeToString(signatureHmac.Sum(nil))
+
 		this.Render("todolist/imageform",
 			"aws_upload_url", awsUploadURL,
 			"policy", policy,
