@@ -59,7 +59,7 @@ func init() {
 	}
 
 	this.Actions["ImageForm"] = func() {
-		awsUploadBucketName := os.Getenv("AWS_UPLOAD_BUCKET_NAME")
+		awsUploadBucketName := os.Getenv("AWS_S3_UPLOAD_BUCKET_NAME")
 		awsUploadURL := "https://" + awsUploadBucketName + ".s3.amazonaws.com/"
 
 		xAmzAlgorithm := "AWS4-HMAC-SHA256"
@@ -71,8 +71,8 @@ func init() {
 		date := currentTime.Format("2006") + currentTime.Format("01") + currentTime.Format("02")
 		xAmzDate := date + "T000000Z"
 
-		awsAccessKeyId := os.Getenv("AWS_ACCESS_KEY_ID")
-		awsRegion := os.Getenv("AWS_REGION")
+		awsAccessKeyId := os.Getenv("AWS_S3_ACCESS_KEY_ID")
+		awsRegion := os.Getenv("AWS_S3_REGION")
 		xAmzCredential := awsAccessKeyId + "/" + date + "/" + awsRegion + "/s3/aws4_request"
 
 		policy :=
@@ -89,7 +89,7 @@ func init() {
 			"}"
 		policy = base64.StdEncoding.EncodeToString([]byte(policy))
 
-		awsSecretAccessKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
+		awsSecretAccessKey := os.Getenv("AWS_S3_SECRET_ACCESS_KEY")
 
 		dateKey := hmac.New(sha256.New, []byte("AWS4" + awsSecretAccessKey))
 		dateKey.Write([]byte(date))
