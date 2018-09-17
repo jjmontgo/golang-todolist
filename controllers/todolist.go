@@ -3,14 +3,9 @@ package controllers
 import (
 	// "fmt"
 	// "log"
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/base64"
-	"encoding/hex"
-	"os"
 	"strings"
-	"time"
 	"golang-todolist/frame"
+	"golang-todolist/frame/aws"
 	"golang-todolist/model"
 )
 
@@ -59,67 +54,20 @@ func init() {
 	}
 
 	this.Actions["ImageForm"] = func() {
-		awsUploadBucketName := os.Getenv("AWS_S3_UPLOAD_BUCKET_NAME")
-		awsUploadURL := "https://" + awsUploadBucketName + ".s3.amazonaws.com/"
-
-		xAmzAlgorithm := "AWS4-HMAC-SHA256"
-
+		keyPath := "test/"
 		successActionStatus := "201"
 		successActionRedirect := frame.AbsoluteURL("index")
-
-		currentTime := time.Now()
-		date := currentTime.Format("2006") + currentTime.Format("01") + currentTime.Format("02")
-		xAmzDate := date + "T000000Z"
-
-		awsAccessKeyId := os.Getenv("AWS_S3_ACCESS_KEY_ID")
-		awsRegion := os.Getenv("AWS_S3_REGION")
-		xAmzCredential := awsAccessKeyId + "/" + date + "/" + awsRegion + "/s3/aws4_request"
-
-		policy :=
-			"{\"expiration\": \"2020-12-01T12:00:00.000Z\"," +
-				"\"conditions\": [" +
-					"{\"bucket\": \"" + awsUploadBucketName + "\" }," +
-					"[\"starts-with\", \"$key\", \"\"]," +
-					"{\"success_action_status\": \"" + successActionStatus + "\"}," +
-					"{\"success_action_redirect\": \"" + successActionRedirect + "\"}," +
-					"{\"x-amz-algorithm\": \"" + xAmzAlgorithm + "\"}," +
-					"{\"x-amz-credential\": \"" + xAmzCredential + "\"}," +
-					"{\"x-amz-date\": \"" + xAmzDate + "\"}," +
-				"]" +
-			"}"
-		policy = base64.StdEncoding.EncodeToString([]byte(policy))
-
-		awsSecretAccessKey := os.Getenv("AWS_S3_SECRET_ACCESS_KEY")
-
-		dateKey := hmac.New(sha256.New, []byte("AWS4" + awsSecretAccessKey))
-		dateKey.Write([]byte(date))
-		dateKeyHmac := dateKey.Sum(nil)
-
-		dateRegionKey := hmac.New(sha256.New, []byte(dateKeyHmac))
-		dateRegionKey.Write([]byte(awsRegion))
-		dateRegionKeyHmac := dateRegionKey.Sum(nil)
-
-		dateRegionServiceKey := hmac.New(sha256.New, []byte(dateRegionKeyHmac))
-		dateRegionServiceKey.Write([]byte("s3"))
-		dateRegionServiceKeyHmac := dateRegionServiceKey.Sum(nil)
-
-		signingKey := hmac.New(sha256.New, []byte(dateRegionServiceKeyHmac))
-		signingKey.Write([]byte("aws4_request"))
-		signingKeyHmac := signingKey.Sum(nil)
-
-		signatureHmac := hmac.New(sha256.New, []byte(signingKeyHmac))
-		signatureHmac.Write([]byte(policy))
-		xAmzSignature := hex.EncodeToString(signatureHmac.Sum(nil))
-
+		vars := aws.S3BrowserBasedUploadFormVariables(keyPath, successActionStatus, successActionRedirect)
 		this.Render("todolist/imageform",
-			"aws_upload_url", awsUploadURL,
-			"policy", policy,
+			"aws_upload_url", vars["aws_upload_url"],
+			"key_path", keyPath,
+			"policy", vars["policy"],
 			"success_action_status", successActionStatus,
 			"success_action_redirect", successActionRedirect,
-			"x_amz_algorithm", xAmzAlgorithm,
-			"x_amz_credential", xAmzCredential,
-			"x_amz_date", xAmzDate,
-			"x_amz_signature", xAmzSignature)
+			"x_amz_algorithm", vars["x_amz_algorithm"],
+			"x_amz_credential", vars["x_amz_credential"],
+			"x_amz_date", vars["x_amz_date"],
+			"x_amz_signature", vars["x_amz_signature"])
 	}
 
 	this.Actions["Delete"] = func() {

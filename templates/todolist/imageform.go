@@ -13,7 +13,7 @@ func init() {
 <a href="{{url "index"}}">Back to Todo Lists</a>
 
 <form action="{{.aws_upload_url}}" method="POST" enctype="multipart/form-data">
-	<input type="hidden" name="key" value="${filename}" />
+	<input type="hidden" name="key" value="{{.key_path}}${filename}" />
 	<input type="hidden" name="policy" value="{{.policy}}" />
 	<input type="hidden" name="success_action_status" value="{{.success_action_status}}" />
 	<input type="hidden" name="success_action_redirect" value="{{.success_action_redirect}}" />
