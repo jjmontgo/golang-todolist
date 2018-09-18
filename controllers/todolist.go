@@ -54,13 +54,16 @@ func init() {
 	}
 
 	this.Actions["ImageForm"] = func() {
-		keyPath := "test/"
+		// just a test
+		aws.DeleteObject("images/4C1F6F93-10E8-4CD4-4517-EFFB015CDDBA/1064621_10152970856395632_1590041866_o.jpg")
+
+		initialKeyPath := "images/"
 		successActionStatus := "201"
 		successActionRedirect := frame.AbsoluteURL("index")
-		vars := aws.S3BrowserBasedUploadFormVariables(keyPath, successActionStatus, successActionRedirect)
+		vars := aws.S3BrowserBasedUploadFormVariables(initialKeyPath, successActionStatus, successActionRedirect)
 		this.Render("todolist/imageform",
 			"aws_upload_url", vars["aws_upload_url"],
-			"key_path", keyPath,
+			"key_path", vars["key_path"],
 			"policy", vars["policy"],
 			"success_action_status", successActionStatus,
 			"success_action_redirect", successActionRedirect,

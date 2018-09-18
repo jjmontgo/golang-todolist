@@ -20,3 +20,11 @@ CREATE TABLE user (
 	INDEX email(email),
 	INDEX password_hash(password_hash)
 );
+CREATE TABLE aws_s3_bucket (
+	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	object_key char(150),
+	category char(50),
+	created_at datetime,
+	UNIQUE object_key(object_key),
+	INDEX category(category)
+)

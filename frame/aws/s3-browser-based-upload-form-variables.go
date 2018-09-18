@@ -3,8 +3,10 @@ package aws
 import (
 	"crypto/hmac"
 	"crypto/sha256"
+	"crypto/rand"
 	"encoding/base64"
 	"encoding/hex"
+	"fmt"
 	"os"
 	"log"
 	"time"
@@ -12,6 +14,10 @@ import (
 // Authenticating Requests in Browser-Based Uploads Using POST (AWS Signature Version 4)
 // https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html
 
+// initialKeyPath - either a subdirectory followed by a slash eg. "images/", or empty string
+// successActionStatus - 2xx status code to return after successful upload
+// successActionRedirect - Full URL to redirect the browser after successful upload, or empty string
+//
 // Returns map with the following keys, to be added as hidden inputs to the file upload form:
 // 		"aws_upload_url"
 // 		"policy"
@@ -21,9 +27,12 @@ import (
 // 		"x_amz_credential"
 // 		"x_amz_date"
 // 		"x_amz_signature"
-func S3BrowserBasedUploadFormVariables(keyPath string, successActionStatus string, successActionRedirect string) map[string]string {
+func S3BrowserBasedUploadFormVariables(initialKeyPath string, successActionStatus string, successActionRedirect string) map[string]string {
 
 	vars := make(map[string]string)
+
+	// make sure each upload path is truly unique
+	vars["key_path"] = initialKeyPath + uniqueId() + "/"
 
 	// Creating a POST Policy
 	// https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-HTTPPOSTConstructPolicy.html
@@ -58,7 +67,7 @@ func S3BrowserBasedUploadFormVariables(keyPath string, successActionStatus strin
 		"{\"expiration\": \"" + expiration + "\"," +
 			"\"conditions\": [" +
 				"{\"bucket\": \"" + awsUploadBucketName + "\" }," +
-				"[\"starts-with\", \"$key\", \"" + keyPath + "\"]," +
+				"[\"starts-with\", \"$key\", \"" + vars["key_path"] + "\"]," +
 				"{\"success_action_status\": \"" + successActionStatus + "\"}," +
 				"{\"success_action_redirect\": \"" + successActionRedirect + "\"}," +
 				"{\"x-amz-algorithm\": \"" + vars["x_amz_algorithm"] + "\"}," +
@@ -98,4 +107,14 @@ func S3BrowserBasedUploadFormVariables(keyPath string, successActionStatus strin
 	vars["x_amz_signature"] = hex.EncodeToString(signatureHmac.Sum(nil))
 
 	return vars
+}
+
+func uniqueId() string {
+	b := make([]byte, 16)
+	_, err := rand.Read(b)
+	if err != nil {
+		return ""
+	}
+
+	return fmt.Sprintf("%X-%X-%X-%X-%X", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 }
