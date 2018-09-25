@@ -1,6 +1,7 @@
 package model
 
 import (
+	"log"
 	"time"
 	"golang-todolist/frame/aws" // delete s3 object
 )
@@ -14,8 +15,8 @@ type MediaAttachment struct {
 	CreatedAt time.Time	`sql:"type:datetime"`
 }
 
-// TODO: add this to beforeDelete gorm hook
 // delete the s3 object as well
-func (this *MediaAttachment) Delete() {
+func (this *MediaAttachment) BeforeDelete() (err error) {
 	aws.DeleteS3Object(this.AwsS3ObjectKey)
+	return
 }

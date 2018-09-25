@@ -19,16 +19,16 @@ func init() {
 
 	this.Actions["Index"] = func() {
 		var todoLists []model.TodoList
-		frame.GORM().Find(&todoLists)
+		this.DB().Find(&todoLists)
 		this.Render("todolist/index", "Results", todoLists)
 	}
 
 	this.Actions["Edit"] = func() {
-		id := frame.StringToUint(this.Param("id"))
+		id := this.ParamUint("id")
 		var todoList model.TodoList
 		// update an existing list
 		if id != 0 {
-			frame.GORM().First(&todoList, id)
+			this.DB().First(&todoList, id)
 		}
 		// or create a new one
 		if todoList.Id == 0 {
@@ -38,7 +38,7 @@ func init() {
 	}
 
 	this.Actions["Save"] = func() {
-		list := model.TodoList{Id: frame.StringToUint(this.Param("id")), Name: this.Param("name")}
+		list := model.TodoList{Id: this.ParamUint("id"), Name: this.Param("name")}
 		list.Name = strings.Trim(this.Param("name"), " ")
 		if list.Name == "" {
 			this.Render("todolist/edit",
@@ -47,7 +47,7 @@ func init() {
 			return
 		}
 
-		frame.GORM().Save(&list)
+		this.DB().Save(&list)
 		this.Redirect(frame.URL("index"))
 	}
 
@@ -80,22 +80,21 @@ func init() {
 	 */
 	this.Actions["ImageUploadComplete"] = func() {
 		// is there already a media attachment?  delete it
-		db := frame.GORM()
 		var existingMediaAttachment model.MediaAttachment
-		db.Where(&model.MediaAttachment{
+		this.DB().Where(&model.MediaAttachment{
 			RefType: "todolist",
-			RefId: frame.StringToUint(this.Param("id")),
+			RefId: this.ParamUint("id"),
 			Category: "main-image",
 		}).First(&existingMediaAttachment)
 		if existingMediaAttachment.Id != 0 {
-			db.Delete(existingMediaAttachment)
+			this.DB().Delete(existingMediaAttachment)
 		}
 
-		db.Create(&model.MediaAttachment{
+		this.DB().Create(&model.MediaAttachment{
 			AwsS3ObjectKey: this.Param("key"),
 			Category: "main-image",
-			RefType: "todolist",
-			RefId: frame.StringToUint(this.Param("id")),
+			RefType: "todo_list",
+			RefId: this.ParamUint("id"),
 			CreatedAt: time.Now(), // YYYY-MM-DD HH:MM:SS
 		})
 
@@ -103,29 +102,27 @@ func init() {
 	}
 
 	this.Actions["Delete"] = func() {
-		db := frame.GORM()
 		var todoList model.TodoList
-		id := frame.StringToUint(this.Param("id"))
-		db.First(&todoList, id)
+		id := this.ParamUint("id")
+		this.DB().First(&todoList, id)
 		if todoList.Id != 0 {
-			db.Delete(&todoList)
+			this.DB().Delete(&todoList)
 		}
 		this.Redirect(frame.URL("index"))
 	}
 
 	this.Actions["Email"] = func() {
-		this.Render("todolist/email", "id", frame.StringToUint(this.Param("id")))
+		this.Render("todolist/email", "id", this.ParamUint("id"))
 	}
 
 	this.Actions["SendEmail"] = func() {
 		body := "Here is your todolist:\n"
 		var todoList model.TodoList
-		id := frame.StringToUint(this.Param("id"))
-		db := frame.GORM()
-		db.First(&todoList, id)
+		id := this.ParamUint("id")
+		this.DB().First(&todoList, id)
 
 		var todos []model.Todo
-		db.Model(&todoList).Related(&todos)
+		this.DB().Model(&todoList).Related(&todos)
 
 		for _, todo := range todos {
 			body += "* " + todo.Name + "\n"
@@ -134,5 +131,3 @@ func init() {
 		this.Redirect(frame.URL("index"))
 	}
 }
-
-

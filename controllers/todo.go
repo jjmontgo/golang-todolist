@@ -11,11 +11,10 @@ func init() {
 	this := frame.NewController("Todo")
 
 	this.Actions["Index"] = func() {
-		db := frame.GORM()
 		var todoList model.TodoList
-		db.First(&todoList, frame.StringToUint(this.Param("id")))
+		this.DB().First(&todoList, this.ParamUint("id"))
 		var todos []model.Todo
-		db.Model(&todoList).Related(&todos)
+		this.DB().Model(&todoList).Related(&todos)
 
 		this.Render(
 			"todo/index",
@@ -25,21 +24,20 @@ func init() {
 	}
 
 	this.Actions["Edit"] = func() {
-		db := frame.GORM()
 		var todo model.Todo
 		// creating a new todo
-		todoListId := frame.StringToUint(this.Param("todo_list_id"))
+		todoListId := this.ParamUint("todo_list_id")
 		// or editing an existing todo
 		if todoListId == 0 {
-			id := frame.StringToUint(this.Param("id"))
-			db.First(&todo, id)
+			id := this.ParamUint("id")
+			this.DB().First(&todo, id)
 			todoListId = todo.TodoListId
 		} else {
 			todo = model.Todo{Name: "", TodoListId: todoListId,}
 		}
 
 		var todoList model.TodoList
-		db.First(&todoList, todoListId)
+		this.DB().First(&todoList, todoListId)
 
 		this.Render("todo/edit",
 			"Todo", todo,
@@ -47,14 +45,12 @@ func init() {
 	}
 
 	this.Actions["Save"] = func() {
-		db := frame.GORM()
-
 		var todoList model.TodoList
-		todoListId := frame.StringToUint(this.Param("todo_list_id"))
-		db.First(&todoList, todoListId)
+		todoListId := this.ParamUint("todo_list_id")
+		this.DB().First(&todoList, todoListId)
 
 		todo := model.Todo{
-			Id: frame.StringToUint(this.Param("id")),
+			Id: this.ParamUint("id"),
 			Name: strings.Trim(this.Param("name"), " "),
 			TodoListId: todoList.Id,
 		}
@@ -67,16 +63,15 @@ func init() {
 			return
 		}
 
-		db.Save(&todo)
+		this.DB().Save(&todo)
 		this.Redirect(frame.URL("todolist", "id", frame.UintToString(todoList.Id)))
 	}
 
 	this.Actions["Delete"] = func() {
-		db := frame.GORM()
-		id := frame.StringToUint(this.Param("id"))
+		id := this.ParamUint("id")
 		var todo model.Todo
-		db.First(&todo, id)
-		db.Delete(&todo)
+		this.DB().First(&todo, id)
+		this.DB().Delete(&todo)
 		this.Redirect(frame.URL("todolist", "id", frame.UintToString(todo.TodoListId)))
 	}
 }

@@ -1,9 +1,11 @@
+
 package frame
 
 import (
 	"log"
 	"net/http"
 	"github.com/gorilla/mux" // required by controller.Param()
+	"github.com/jinzhu/gorm" // required by controller.DB()
 )
 
 type Controller struct {
@@ -46,9 +48,21 @@ func (this *Controller) Param(name string) string {
 	return param
 }
 
+/**
+ * Typically used for retrieving an id from the request as a uint
+ */
+func (this *Controller) ParamUint(name string) uint {
+	strParam := this.Param(name)
+	return StringToUint(strParam) // see frame/helpers.go
+}
+
 func (this *Controller) Error(error error) {
 	http.Error(Registry.Response, error.Error(), 500)
 	log.Fatal(error)
+}
+
+func (this *Controller) DB() *gorm.DB {
+	return GORM() // see frame/gorm.go
 }
 
 func (this *Controller) Email(to string, subject string, body string, from string) {

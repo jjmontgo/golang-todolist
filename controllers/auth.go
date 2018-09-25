@@ -26,9 +26,8 @@ func init() {
 		}
 
 		if !isError {
-			db := frame.GORM()
 			var user model.User
-			db.Where("username = ?", this.Param("username")).First(&user)
+			this.DB().Where("username = ?", this.Param("username")).First(&user)
 			if user.Id == 0 {
 				isError = true
 			} else {

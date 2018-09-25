@@ -59,7 +59,7 @@ And run it locally:
 	To trigger the Lambda function from API Gateway while keeping w http.ResponseWriter, r *http.Request in handler functions.
 * github.com/gorilla/mux
 	Used for improved routing.
-* upper.io/db.v2/mysql
+* github.com/jinzhu/gorm
 	Used as data access layer.
 * https://github.com/srinathgs/mysqlstore
 	Gorilla's Session Store Implementation for MySQL
