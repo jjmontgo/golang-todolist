@@ -26,8 +26,10 @@ func init() {
 		}
 
 		if !isError {
-			user := model.FindUser("username", this.Param("username"))
-			if user == nil {
+			db := frame.GORM()
+			var user model.User
+			db.Where("username = ?", this.Param("username")).First(&user)
+			if user.Id == 0 {
 				isError = true
 			} else {
 				isValidPassword := frame.VerifyPassword(this.Param("password"), user.PasswordHash)

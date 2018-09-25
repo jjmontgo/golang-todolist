@@ -9,7 +9,7 @@ import (
 	"log"
 )
 
-func DeleteObject(objectKey string) {
+func DeleteS3Object(objectKey string) {
 	sess := getClientConfigProvider()
 	svc := s3.New(sess)
 	bucket := os.Getenv("AWS_S3_UPLOAD_BUCKET_NAME")

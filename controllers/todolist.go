@@ -4,6 +4,7 @@ import (
 	// "fmt"
 	// "log"
 	"strings"
+	"time"
 	"golang-todolist/frame"
 	"golang-todolist/frame/aws"
 	"golang-todolist/model"
@@ -17,26 +18,27 @@ func init() {
 	}
 
 	this.Actions["Index"] = func() {
-		todoLists := model.FindTodolists()
+		var todoLists []model.TodoList
+		frame.GORM().Find(&todoLists)
 		this.Render("todolist/index", "Results", todoLists)
 	}
 
 	this.Actions["Edit"] = func() {
 		id := frame.StringToUint(this.Param("id"))
-		var list *model.Todolist
+		var todoList model.TodoList
 		// update an existing list
 		if id != 0 {
-			list = model.FindTodolist("id", id)
+			frame.GORM().First(&todoList, id)
 		}
 		// or create a new one
-		if list == nil {
-			list = &model.Todolist{Name: "",}
+		if todoList.Id == 0 {
+			todoList = model.TodoList{Name: "",}
 		}
-		this.Render("todolist/edit", "List", list)
+		this.Render("todolist/edit", "List", todoList)
 	}
 
 	this.Actions["Save"] = func() {
-		list := model.Todolist{Id: frame.StringToUint(this.Param("id")), Name: this.Param("name")}
+		list := model.TodoList{Id: frame.StringToUint(this.Param("id")), Name: this.Param("name")}
 		list.Name = strings.Trim(this.Param("name"), " ")
 		if list.Name == "" {
 			this.Render("todolist/edit",
@@ -45,22 +47,22 @@ func init() {
 			return
 		}
 
-		err := frame.SaveRecord(&list)
-		if err != nil {
-			this.Error(err)
-			return
-		}
+		frame.GORM().Save(&list)
 		this.Redirect(frame.URL("index"))
 	}
 
 	this.Actions["ImageForm"] = func() {
-		// just a test
-		aws.DeleteObject("images/4C1F6F93-10E8-4CD4-4517-EFFB015CDDBA/1064621_10152970856395632_1590041866_o.jpg")
-
-		initialKeyPath := "images/"
+		// put object in root folder
+		initialKeyPath := ""
 		successActionStatus := "201"
-		successActionRedirect := frame.AbsoluteURL("index")
-		vars := aws.S3BrowserBasedUploadFormVariables(initialKeyPath, successActionStatus, successActionRedirect)
+		// redirect here after upload complete with URL params:
+		// ?bucket=&key=&etag=
+		successActionRedirect := frame.AbsoluteURL("todolist_image_upload_complete", "id", this.Param("id"))
+		vars := aws.S3BrowserBasedUploadFormVariables(
+			initialKeyPath,
+			successActionStatus,
+			successActionRedirect,
+		)
 		this.Render("todolist/imageform",
 			"aws_upload_url", vars["aws_upload_url"],
 			"key_path", vars["key_path"],
@@ -73,9 +75,41 @@ func init() {
 			"x_amz_signature", vars["x_amz_signature"])
 	}
 
+	/**
+	 * GET ?bucket=&key=&etag= from Amazon S3 Redirect
+	 */
+	this.Actions["ImageUploadComplete"] = func() {
+		// is there already a media attachment?  delete it
+		db := frame.GORM()
+		var existingMediaAttachment model.MediaAttachment
+		db.Where(&model.MediaAttachment{
+			RefType: "todolist",
+			RefId: frame.StringToUint(this.Param("id")),
+			Category: "main-image",
+		}).First(&existingMediaAttachment)
+		if existingMediaAttachment.Id != 0 {
+			db.Delete(existingMediaAttachment)
+		}
+
+		db.Create(&model.MediaAttachment{
+			AwsS3ObjectKey: this.Param("key"),
+			Category: "main-image",
+			RefType: "todolist",
+			RefId: frame.StringToUint(this.Param("id")),
+			CreatedAt: time.Now(), // YYYY-MM-DD HH:MM:SS
+		})
+
+		this.Redirect(frame.URL("index"))
+	}
+
 	this.Actions["Delete"] = func() {
-		todolist := model.FindTodolist("id", this.Param("id"))
-		todolist.Delete()
+		db := frame.GORM()
+		var todoList model.TodoList
+		id := frame.StringToUint(this.Param("id"))
+		db.First(&todoList, id)
+		if todoList.Id != 0 {
+			db.Delete(&todoList)
+		}
 		this.Redirect(frame.URL("index"))
 	}
 
@@ -85,8 +119,14 @@ func init() {
 
 	this.Actions["SendEmail"] = func() {
 		body := "Here is your todolist:\n"
-		list := model.FindTodolist("id", this.Param("id"))
-		todos := list.GetTodos()
+		var todoList model.TodoList
+		id := frame.StringToUint(this.Param("id"))
+		db := frame.GORM()
+		db.First(&todoList, id)
+
+		var todos []model.Todo
+		db.Model(&todoList).Related(&todos)
+
 		for _, todo := range todos {
 			body += "* " + todo.Name + "\n"
 		}

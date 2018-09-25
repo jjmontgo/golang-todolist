@@ -20,11 +20,14 @@ CREATE TABLE user (
 	INDEX email(email),
 	INDEX password_hash(password_hash)
 );
-CREATE TABLE aws_s3_bucket (
-	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-	object_key char(150),
-	category char(50),
+CREATE TABLE media_attachment (
+	id int unsigned auto_increment primary key,
+	aws_s3_object_key char(150),
+	category char(50), # 'main-image'
+	ref_type char(50), # entity name 'todolist', 'todo'
+	ref_id int unsigned,
 	created_at datetime,
-	UNIQUE object_key(object_key),
+	UNIQUE aws_s3_object_key(aws_s3_object_key),
+	INDEX ref(ref_type, ref_id),
 	INDEX category(category)
-)
+);

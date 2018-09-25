@@ -52,6 +52,5 @@ func (this *Controller) Error(error error) {
 }
 
 func (this *Controller) Email(to string, subject string, body string, from string) {
-	log.Print("Called controller email function")
 	Email(to, subject, body, from)
 }

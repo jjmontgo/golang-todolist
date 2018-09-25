@@ -22,6 +22,8 @@ func InitRouter() http.Handler {
 
 	r.HandleFunc("/todolist/image-form/{id:[0-9]+}", frame.Dispatch("Todolist", "ImageForm")).Name("todolist_image_form")
 
+	r.HandleFunc("/todolist/image-upload-complete/{id:[0-9]+}", frame.Dispatch("Todolist", "ImageUploadComplete")).Name("todolist_image_upload_complete")
+
 	r.HandleFunc("/todolist/delete/{id}", frame.Dispatch("Todolist", "Delete")).
 		Methods("POST").
 		Name("todolist_delete")
