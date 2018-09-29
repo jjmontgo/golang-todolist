@@ -3,6 +3,7 @@ package controllers
 import (
 	// "fmt"
 	// "log"
+	// "os"
 	"strings"
 	"time"
 	"golang-todolist/frame"
@@ -19,7 +20,7 @@ func init() {
 
 	this.Actions["Index"] = func() {
 		var todoLists []model.TodoList
-		this.DB().Find(&todoLists)
+		this.DB().Preload("MediaAttachment").Find(&todoLists)
 		this.Render("todolist/index", "Results", todoLists)
 	}
 

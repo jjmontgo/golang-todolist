@@ -4,6 +4,8 @@ import (
 	"os"
 	"log"
 	"strconv"
+	"strings"
+	"unicode"
 )
 
 func URL(name string, vars ...string) string {
@@ -53,4 +55,13 @@ func StringToUint(value string) uint {
 
 func UintToString(value uint) string {
 	return strconv.FormatUint(uint64(value), 10)
+}
+
+func RemoveWhitespace(str string) string {
+	return strings.Map(func(r rune) rune {
+		if unicode.IsSpace(r) {
+			return -1
+		}
+		return r
+	}, str)
 }

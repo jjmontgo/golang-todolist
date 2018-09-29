@@ -1,12 +1,23 @@
 package model
 
-import "golang-todolist/frame"
+import (
+	"golang-todolist/frame"
+	"golang-todolist/frame/aws"
+)
 
 type TodoList struct {
 	Id uint `sql:"type:int PRIMARY KEY"`
 	Name string `sql:"type:varchar(250)"`
 	Todos []Todo
 	MediaAttachment *MediaAttachment `gorm:"polymorphic:Ref;"`
+}
+
+func (this *TodoList) GetImgSrc() string {
+	if this.MediaAttachment == nil {
+		return ""
+	}
+
+	return aws.SignS3ObjectUrl(this.MediaAttachment.AwsS3ObjectKey)
 }
 
 func (this *TodoList) BeforeDelete() (err error) {

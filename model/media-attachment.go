@@ -1,7 +1,6 @@
 package model
 
 import (
-	"log"
 	"time"
 	"golang-todolist/frame/aws" // delete s3 object
 )
