@@ -20,11 +20,13 @@ func init() {
 			<div class="row">
 				<div class="col-sm">
 					{{$imgSrc := .GetImgSrc}}
-					{{if ne $imgSrc ""}}
-						<img src="{{$imgSrc}}" class="img-fluid" />
-					{{else}}
-						<a href="{{url "todolist_image_form" "id" $id}}">No Image</a>
-					{{end}}
+					<a href="{{url "todolist_image_form" "id" $id}}">
+						{{if ne $imgSrc ""}}
+							<img src="{{$imgSrc}}" class="img-fluid" />
+						{{else}}
+							No Image
+						{{end}}
+					</a>
 				</div>
 				<div class="col-sm">
 					{{.Id}} {{.Name}}

@@ -83,12 +83,12 @@ func init() {
 		// is there already a media attachment?  delete it
 		var existingMediaAttachment model.MediaAttachment
 		this.DB().Where(&model.MediaAttachment{
-			RefType: "todolist",
+			RefType: "todo_list",
 			RefId: this.ParamUint("id"),
 			Category: "main-image",
 		}).First(&existingMediaAttachment)
 		if existingMediaAttachment.Id != 0 {
-			this.DB().Delete(existingMediaAttachment)
+			this.DB().Delete(&existingMediaAttachment)
 		}
 
 		this.DB().Create(&model.MediaAttachment{
@@ -98,6 +98,8 @@ func init() {
 			RefId: this.ParamUint("id"),
 			CreatedAt: time.Now(), // YYYY-MM-DD HH:MM:SS
 		})
+
+		aws.ResizeS3ObjectImage(this.Param("key"), 150, 150)
 
 		this.Redirect(frame.URL("index"))
 	}
