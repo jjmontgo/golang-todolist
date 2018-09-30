@@ -3,6 +3,7 @@ package frame
 import (
 	"log"
 	"os"
+	"github.com/gorilla/sessions"
 	"github.com/srinathgs/mysqlstore"
 	// "golang-todolist/model"
 )
@@ -28,36 +29,35 @@ func GetSessionStore() *mysqlstore.MySQLStore {
 	if sessionErr != nil {
 		panic(sessionErr)
 	}
-	//defer store.Close()
-
 	return SessionStore
 }
 
 func SessionSetVar(field string, value interface{}) {
-	session, err := GetSessionStore().Get(Registry.Request, os.Getenv("SESSION_NAME"))
+	session := GetSession()
 	session.Values[field] = value
-	err = session.Save(Registry.Request, Registry.Response)
-	if err != nil {
-		log.Fatalf("SessionSetVar(): %q\n", err)
-	}
 }
 
 func SessionGetVar(field string) interface{} {
-	session, err := GetSessionStore().Get(Registry.Request, os.Getenv("SESSION_NAME"))
-	if err != nil {
-		log.Fatalf("SessionGetVar(): %q\n", err)
-	}
+	session := GetSession()
 	return session.Values[field]
 }
 
-// func SessionGetUser() *model.User {
-// 	val := SessionGetVar("user")
-// 	var user = &model.User{}
-// 	if user, ok := val.(*model.User); !ok {
-// 		return nil
-// 	}
-// 	return user
-// }
+func GetSession() *sessions.Session {
+	session, err := GetSessionStore().Get(Registry.Request, os.Getenv("SESSION_NAME"))
+	if err != nil {
+		log.Fatalf("GetSession(): %q\n", err)
+	}
+	return session
+}
+
+// called by dispatch.go
+func SessionSave() {
+	session := GetSession()
+	err := session.Save(Registry.Request, Registry.Response)
+	if err != nil {
+		log.Fatalf("SessionSave(): %q\n", err)
+	}
+}
 
 func UserIsLoggedIn() bool {
 	return SessionGetVar("user") != nil

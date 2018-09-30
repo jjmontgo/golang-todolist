@@ -21,5 +21,6 @@ func Dispatch(controllerName string, actionName string) http.HandlerFunc {
 			return
 		}
 		action()
+		controller.AfterAction()
 	}
 }

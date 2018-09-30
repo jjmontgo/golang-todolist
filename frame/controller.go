@@ -28,12 +28,17 @@ func NewController(name string) *Controller {
 	return newController
 }
 
+func (this *Controller) AfterAction() {
+	SessionSave() // saves session data if any was added; update expiry
+}
+
 func (this *Controller) Render(templateName string, params ...interface{}) {
 	view := Registry.Views[templateName]
 	view.Render(params...)
 }
 
 func (this *Controller) Redirect(url string) {
+	this.AfterAction() // action is ended early
 	http.Redirect(Registry.Response, Registry.Request, url, 302)
 }
 
