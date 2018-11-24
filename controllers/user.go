@@ -11,26 +11,26 @@ func init() {
 	this.Actions["Index"] = func() {
 		var users []model.User
 		this.DB().Find(&users)
-		this.Render("user/index", "Users", users)
+		this.RenderJSON("users", users)
 	}
 
 	this.Actions["Edit"] = func() {
-		id := frame.StringToUint(this.Param("id"))
-		var user *model.User
-		if id != 0 {
+		id := this.ParamUint("id")
+		var user model.User
+		if id == 0 {
+			// new user
+			user = model.User{Username: "", Email: ""}
+		} else {
 			this.DB().First(&user, id)
 		}
-		if user == nil {
-			user = &model.User{Username: "", Email: ""}
-		}
-		this.Render("user/edit", "User", user)
+		this.RenderJSON("user", user)
 	}
 
 	this.Actions["Save"] = func() {
-		var user *model.User
+		var user model.User
 		id := this.ParamUint("id")
 		if id == 0 {
-			user = &model.User{
+			user = model.User{
 				Username: this.Param("username"),
 				Email: this.Param("email")}
 		} else {
@@ -43,13 +43,13 @@ func init() {
 			user.PasswordHash = frame.HashPassword(this.Param("password"))
 		}
 		this.DB().Save(&user)
-		this.Redirect(frame.URL("users"))
+		this.Redirect(this.URL("users"))
 	}
 
 	this.Actions["Delete"] = func() {
 		id := frame.StringToUint(this.Param("id"))
 		user := model.User{Id: id}
 		this.DB().Delete(&user)
-		this.Redirect(frame.URL("users"))
+		this.Redirect(this.URL("users"))
 	}
 }

@@ -10,16 +10,19 @@ import (
 func init() {
 	this := frame.NewController("Todo")
 
+	this.IsAccessible = func(actionName string) bool {
+		return this.UserIsLoggedIn()
+	}
+
 	this.Actions["Index"] = func() {
 		var todoList model.TodoList
 		this.DB().First(&todoList, this.ParamUint("id"))
 		var todos []model.Todo
 		this.DB().Model(&todoList).Related(&todos)
 
-		this.Render(
-			"todo/index",
-			"List", todoList,
-			"Todos", todos,
+		this.RenderJSON(
+			"todolist", todoList,
+			"todos", todos,
 		)
 	}
 
@@ -39,9 +42,7 @@ func init() {
 		var todoList model.TodoList
 		this.DB().First(&todoList, todoListId)
 
-		this.Render("todo/edit",
-			"Todo", todo,
-			"List", todoList)
+		this.RenderJSON("todo", todo)
 	}
 
 	this.Actions["Save"] = func() {
@@ -56,15 +57,11 @@ func init() {
 		}
 
 		if todo.Name == "" {
-			this.Render("todo/edit",
-				"Todo", todo,
-				"List", todoList,
-				"Error", "You must enter a name.")
+			this.RenderJsonError("message", "You must enter a name.")
 			return
 		}
 
 		this.DB().Save(&todo)
-		this.Redirect(frame.URL("todolist", "id", frame.UintToString(todoList.Id)))
 	}
 
 	this.Actions["Delete"] = func() {
@@ -72,6 +69,5 @@ func init() {
 		var todo model.Todo
 		this.DB().First(&todo, id)
 		this.DB().Delete(&todo)
-		this.Redirect(frame.URL("todolist", "id", frame.UintToString(todo.TodoListId)))
 	}
 }

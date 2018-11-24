@@ -15,13 +15,13 @@ func init() {
 	this := frame.NewController("Todolist")
 
 	this.IsAccessible = func(actionName string) bool {
-		return frame.UserIsLoggedIn()
+		return this.UserIsLoggedIn()
 	}
 
 	this.Actions["Index"] = func() {
 		var todoLists []model.TodoList
 		this.DB().Preload("MediaAttachment").Find(&todoLists)
-		this.Render("todolist/index", "Results", todoLists)
+		this.RenderJSON("todolists", todoLists)
 	}
 
 	this.Actions["Edit"] = func() {
@@ -35,21 +35,18 @@ func init() {
 		if todoList.Id == 0 {
 			todoList = model.TodoList{Name: "",}
 		}
-		this.Render("todolist/edit", "List", todoList)
+		this.RenderJSON("todolist", todoList)
 	}
 
 	this.Actions["Save"] = func() {
 		list := model.TodoList{Id: this.ParamUint("id"), Name: this.Param("name")}
 		list.Name = strings.Trim(this.Param("name"), " ")
 		if list.Name == "" {
-			this.Render("todolist/edit",
-				"List", list,
-				"Error", "You must enter a name.")
+			this.RenderJsonError("message", "You must enter a name.")
 			return
 		}
 
 		this.DB().Save(&list)
-		this.Redirect(frame.URL("index"))
 	}
 
 	this.Actions["ImageForm"] = func() {
@@ -58,13 +55,14 @@ func init() {
 		successActionStatus := "201"
 		// redirect here after upload complete with URL params:
 		// ?bucket=&key=&etag=
-		successActionRedirect := frame.AbsoluteURL("todolist_image_upload_complete", "id", this.Param("id"))
+		// successActionRedirect := frame.AbsoluteURL("todolist_image_upload_complete", "id", this.Param("id"))
+		successActionRedirect := "" // no redirect
 		vars := aws.S3BrowserBasedUploadFormVariables(
 			initialKeyPath,
 			successActionStatus,
 			successActionRedirect,
 		)
-		this.Render("todolist/imageform",
+		this.RenderJSON(
 			"aws_upload_url", vars["aws_upload_url"],
 			"key_path", vars["key_path"],
 			"policy", vars["policy"],
@@ -100,8 +98,6 @@ func init() {
 		})
 
 		aws.ResizeS3ObjectImage(this.Param("key"), 150, 150)
-
-		this.Redirect(frame.URL("index"))
 	}
 
 	this.Actions["Delete"] = func() {
@@ -111,7 +107,6 @@ func init() {
 		if todoList.Id != 0 {
 			this.DB().Delete(&todoList)
 		}
-		this.Redirect(frame.URL("index"))
 	}
 
 	this.Actions["Email"] = func() {
@@ -131,6 +126,5 @@ func init() {
 			body += "* " + todo.Name + "\n"
 		}
 		this.Email(this.Param("email"), "Todolist", body, "")
-		this.Redirect(frame.URL("index"))
 	}
 }

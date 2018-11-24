@@ -20,11 +20,11 @@ func GORM() *gorm.DB {
 	password := os.Getenv("MYSQL_PASSWORD")
 	database := os.Getenv("MYSQL_DB")
 	dsn :=  user + ":" + password + "@tcp(" + host + ":3306)/" + database + "?charset=utf8&parseTime=True&loc=Local"
-	gormDB, err := gorm.Open("mysql", dsn)
-	if err != nil {
+	gormDB, dbErr = gorm.Open("mysql", dsn)
+	if dbErr != nil {
 		panic("Failed to connect database")
 	}
-
+	dbInitialized = true
 	gormDB.SingularTable(true) // singular table names
 
 	if os.Getenv("MODE") == "dev" {

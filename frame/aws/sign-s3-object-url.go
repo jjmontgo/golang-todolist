@@ -35,7 +35,7 @@ func SignS3ObjectUrl(objectKey string) string {
 	rsaPrivateKey, _ := x509.ParsePKCS1PrivateKey(pem.Bytes)
 
 	// time.Time 1 hour from now
-	expiryTime := time.Now().Local().Add(time.Hour * time.Duration(1))
+	expiryTime := time.Now().UTC().Add(time.Hour * time.Duration(1))
 
 	resource := baseURL + "/" + objectKey
 	newCannedPolicy := sign.NewCannedPolicy(resource, expiryTime)

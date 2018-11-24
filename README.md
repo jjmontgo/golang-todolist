@@ -14,6 +14,8 @@ Add the following to a .env file in the main src directory of the project:
 ```
 MODE=dev
 PORT=8080
+# Allow CORs from this origin
+FRONTEND_ORIGIN=http://hostname
 MYSQL_USERNAME=<username>
 MYSQL_PASSWORD=<password>
 MYSQL_DB=golang_todolist

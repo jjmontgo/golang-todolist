@@ -6,10 +6,11 @@ import (
 )
 
 type TodoList struct {
-	Id uint `sql:"type:int PRIMARY KEY"`
-	Name string `sql:"type:varchar(250)"`
-	Todos []Todo
-	MediaAttachment *MediaAttachment `gorm:"polymorphic:Ref;"`
+	Id uint `sql:"type:int PRIMARY KEY" json:"id"`
+	Name string `sql:"type:varchar(250)" json:"name"`
+	Todos []Todo `json:"todos"`
+	ImgSrc string `sql:"-" json:"img_src"` // populated by TodoList.GetImgSrc()
+	MediaAttachment *MediaAttachment `gorm:"polymorphic:Ref;" json:"media_attachment"`
 }
 
 func (this *TodoList) GetImgSrc() string {
@@ -18,6 +19,11 @@ func (this *TodoList) GetImgSrc() string {
 	}
 
 	return aws.SignS3ObjectUrl(this.MediaAttachment.AwsS3ObjectKey)
+}
+
+func (this *TodoList) AfterFind() (err error) {
+	this.ImgSrc = this.GetImgSrc()
+	return
 }
 
 func (this *TodoList) BeforeDelete() (err error) {

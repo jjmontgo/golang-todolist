@@ -1,33 +1,35 @@
 package frame
 
 import (
-	"os"
 	"log"
 	"strconv"
 	"strings"
 	"unicode"
 )
 
-func URL(name string, vars ...string) string {
-	url, err := Registry.Router.Get(name).URL(vars...)
-	if (err != nil) {
-		log.Fatalf("Registry.Router.Get(name).URL(): %q\n", err)
-	}
-	apiGatewayPathPrefix := os.Getenv("API_GATEWAY_PATH_PREFIX")
-	return apiGatewayPathPrefix + url.String()
-}
-
-func AbsoluteURL(name string, vars ...string) string {
-	relativeURL := URL(name, vars...)
-	var httpOrHttps string
-	isUsingTLS := Registry.Request.TLS != nil
-	isProxiedHttps := Registry.Request.Header.Get("X-Forwarded-Proto") == "https"
-	if isUsingTLS || isProxiedHttps {
-		httpOrHttps = "https://"
+/**
+ * Takes an even, indefinite number of function arguments and translates
+ * it into a string-indexed map.
+ *
+ * eg. Function("var1", value, "var2", value) ...
+ * 	map["var1"] = value; map["var2"] = value;
+ */
+func BuildParameterMap(params ...interface{}) map[string]interface{} {
+	vars := make(map[string]interface{})
+	if len(params) % 2 == 0 {
+		// populate the vars map; vars[params[0]] = vars[params[1]]
+		var key string
+		for i, v := range params {
+			if i % 2 == 0 {
+				key = ToString(v) // frame/helpers.go
+			} else {
+				vars[key] = v
+			}
+		}
 	} else {
-		httpOrHttps = "http://"
+		log.Printf("BuildParameterMap received uneven number of arguments: %v", params)
 	}
-	return httpOrHttps + Registry.Request.Host + relativeURL
+	return vars
 }
 
 func ToString(value interface{}) string {

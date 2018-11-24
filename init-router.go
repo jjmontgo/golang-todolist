@@ -74,5 +74,7 @@ func InitRouter() http.Handler {
 
 	r.HandleFunc("/logout", frame.Dispatch("Auth", "Logout")).Name("logout")
 
+	r.HandleFunc("/urls", frame.Dispatch("App", "Urls")).Name("urls")
+
 	return r
 }

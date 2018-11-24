@@ -2,6 +2,7 @@ package frame
 
 import (
 	"html/template"
+	"net/http"
 	"bytes"
 	"log"
 	// "fmt"
@@ -10,8 +11,6 @@ import (
 func NewView(view *View) {
 	tpl := template.New(view.Name)
 	tpl.Funcs(template.FuncMap{
-		"url": URL, // frame/helpers.go
-		"user_is_logged_in": UserIsLoggedIn, // frame/auth.go
 		"to_string": ToString, // frame/helpers.go
 		"uint_to_string": UintToString,
 	})
@@ -29,21 +28,15 @@ type View struct {
 	HasLayout bool
 	LayoutTemplateName string // default to "layout"
 	ParsedTemplate *template.Template
+
+	// must be set by controller
+	Response http.ResponseWriter
 }
 
-func (this *View) Render(params ...interface{}) {
-	vars := make(map[string]interface{})
-	if len(params) % 2 == 0 {
-		// populate the vars map; vars[params[0]] = vars[params[1]]
-		var key string
-		for i, v := range params {
-			if i % 2 == 0 {
-				key = ToString(v) // frame/helpers.go
-			} else {
-				vars[key] = v
-			}
-		}
-	}
+func (this *View) Render(response http.ResponseWriter, params ...interface{}) {
+	this.Response = response
+
+	vars := BuildParameterMap(params...) // frame/helpers.go
 
 	if this.HasLayout {
 		// buffer the template to renderedContent
@@ -54,9 +47,9 @@ func (this *View) Render(params ...interface{}) {
 		// render the content to the layout as html
 		layoutView := Registry.Views[this.LayoutTemplateName]
 		html := template.HTML(renderedContent.String())
-		layoutView.Render("Content", html)
+		layoutView.Render(response, "Content", html)
 	} else {
 		// render the template to the response with no layout
-		this.ParsedTemplate.Execute(Registry.Response, vars)
+		this.ParsedTemplate.Execute(this.Response, vars)
 	}
 }
