@@ -8,15 +8,6 @@ import (
 func init() {
 	this := frame.NewController("Auth")
 
-	this.Actions["Login"] = func() {
-		if this.UserIsLoggedIn() {
-			this.Redirect(this.URL("index"))
-			return
-		}
-
-		this.Render("auth/login")
-	}
-
 	this.Actions["ValidateLogin"] = func() {
 		isError := false
 

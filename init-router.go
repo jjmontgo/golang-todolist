@@ -28,10 +28,6 @@ func InitRouter() http.Handler {
 		Methods("POST").
 		Name("todolist_delete")
 
-	r.HandleFunc("/todolist/email/{id}", frame.Dispatch("Todolist", "Email")).
-		Methods("GET").
-		Name("todolist_email")
-
 	r.HandleFunc("/todolist/email/{id}", frame.Dispatch("Todolist", "SendEmail")).
 		Methods("POST").
 		Name("todolist_send_email")
@@ -54,7 +50,8 @@ func InitRouter() http.Handler {
 
 	r.HandleFunc("/user/new", frame.Dispatch("User", "Edit")).Name("user_new")
 
-	r.HandleFunc("/user/edit/{id:[0-9]+}", frame.Dispatch("User", "Edit")).Name("user_edit")
+	r.HandleFunc("/user/edit/{id:[0-9]+}", frame.Dispatch("User", "Edit")).
+		Name("user_edit")
 
 	r.HandleFunc("/user/save", frame.Dispatch("User", "Save")).
 		Methods("POST").
@@ -64,17 +61,16 @@ func InitRouter() http.Handler {
 		Methods("POST").
 		Name("user_delete")
 
-	r.HandleFunc("/login", frame.Dispatch("Auth", "Login")).
-		Methods("GET").
-		Name("login")
-
 	r.HandleFunc("/login", frame.Dispatch("Auth", "ValidateLogin")).
 		Methods("POST").
-		Name("login_validate")
+		Name("login")
 
 	r.HandleFunc("/logout", frame.Dispatch("Auth", "Logout")).Name("logout")
 
 	r.HandleFunc("/urls", frame.Dispatch("App", "Urls")).Name("urls")
+
+	r.HandleFunc("/translations", frame.Dispatch("App", "Translations")).
+		Name("urls")
 
 	return r
 }

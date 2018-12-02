@@ -1,6 +1,7 @@
 package frame
 
 import (
+	"encoding/json"
 	"html/template"
 	"net/http"
 	"bytes"
@@ -13,7 +14,10 @@ func NewView(view *View) {
 	tpl.Funcs(template.FuncMap{
 		"to_string": ToString, // frame/helpers.go
 		"uint_to_string": UintToString,
-	})
+		"json_encode": func(v interface {}) template.HTML {
+		  a, _ := json.Marshal(v)
+		  return template.HTML(a)
+		}})
 	if view.LayoutTemplateName == "" {
 		view.LayoutTemplateName = "layout"
 	}
@@ -33,9 +37,7 @@ type View struct {
 	Response http.ResponseWriter
 }
 
-func (this *View) Render(response http.ResponseWriter, params ...interface{}) {
-	this.Response = response
-
+func (this *View) Render(params ...interface{}) {
 	vars := BuildParameterMap(params...) // frame/helpers.go
 
 	if this.HasLayout {
@@ -47,7 +49,7 @@ func (this *View) Render(response http.ResponseWriter, params ...interface{}) {
 		// render the content to the layout as html
 		layoutView := Registry.Views[this.LayoutTemplateName]
 		html := template.HTML(renderedContent.String())
-		layoutView.Render(response, "Content", html)
+		layoutView.Render("Content", html)
 	} else {
 		// render the template to the response with no layout
 		this.ParsedTemplate.Execute(this.Response, vars)

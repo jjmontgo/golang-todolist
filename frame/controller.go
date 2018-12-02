@@ -46,7 +46,8 @@ func (this *Controller) AfterAction() {
 func (this *Controller) Render(templateName string, params ...interface{}) {
 	// otherwise render the template
 	view := Registry.Views[templateName]
-	view.Render(this.Response, params...)
+	view.Response = this.Response
+	view.Render(params...)
 }
 
 func (this *Controller) RenderJSON(params ...interface{}) {

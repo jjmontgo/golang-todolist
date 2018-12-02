@@ -43,13 +43,11 @@ func init() {
 			user.PasswordHash = frame.HashPassword(this.Param("password"))
 		}
 		this.DB().Save(&user)
-		this.Redirect(this.URL("users"))
 	}
 
 	this.Actions["Delete"] = func() {
 		id := frame.StringToUint(this.Param("id"))
 		user := model.User{Id: id}
 		this.DB().Delete(&user)
-		this.Redirect(this.URL("users"))
 	}
 }

@@ -19,6 +19,14 @@ func init() {
 			routes[name] = this.Scheme() + this.Request.Host + prefix + path
 			return nil
 		})
-		this.RenderJSON("urls", routes)
+		this.Response.Header().Set("Content-Type", "text/javascript")
+		this.Render("app/urls", "Routes", routes)
+	}
+
+	// Make all translations available in JSON
+	this.Actions["Translations"] = func() {
+		lang := "en"
+		this.Response.Header().Set("Content-Type", "text/javascript")
+		this.Render("app/translations", "Translations", frame.Registry.Translations[lang])
 	}
 }

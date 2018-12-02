@@ -6,6 +6,7 @@ type registry struct{
 	Router *mux.Router
 	Controllers map[string]*Controller
 	Views map[string]*View
+	Translations map[string]map[string]string
 }
 
 var Registry registry

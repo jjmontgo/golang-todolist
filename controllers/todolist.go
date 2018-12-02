@@ -109,10 +109,6 @@ func init() {
 		}
 	}
 
-	this.Actions["Email"] = func() {
-		this.Render("todolist/email", "id", this.ParamUint("id"))
-	}
-
 	this.Actions["SendEmail"] = func() {
 		body := "Here is your todolist:\n"
 		var todoList model.TodoList
