@@ -1,19 +1,34 @@
 package frame
 
 import (
+	"log"
 	"os"
+	"github.com/gorilla/sessions"
+	"github.com/savaki/dynastore"
 	"github.com/srinathgs/mysqlstore"
 )
 
-var SessionStore *mysqlstore.MySQLStore
+var SessionStore sessions.Store
 var sessionErr error
 var sessionStoreInitialized bool
 
-func GetSessionStore() *mysqlstore.MySQLStore {
+func GetSessionStore() sessions.Store {
 	if sessionStoreInitialized == true {
 		return SessionStore
 	}
 
+	mode := os.Getenv("MODE")
+	if mode == "prod" {
+		useDynamoDbSessionStore()
+	} else {
+		useMysqlSessionStore()
+	}
+
+	sessionStoreInitialized = true
+	return SessionStore
+}
+
+func useMysqlSessionStore() {
 	SessionStore, sessionErr = mysqlstore.NewMySQLStore(
 		os.Getenv("SESSION_MYSQL_USERNAME") + ":" +
 		os.Getenv("SESSION_MYSQL_PASSWORD") + "@tcp(" +
@@ -24,8 +39,13 @@ func GetSessionStore() *mysqlstore.MySQLStore {
 		3600,
 		[]byte("gewdewdsedfs"))
 	if sessionErr != nil {
-		panic(sessionErr)
+	  log.Fatalln(sessionErr)
 	}
-	sessionStoreInitialized = true
-	return SessionStore
+}
+
+func useDynamoDbSessionStore() {
+	SessionStore, sessionErr = dynastore.New(dynastore.Path("/"), dynastore.HTTPOnly())
+	if sessionErr != nil {
+	  log.Fatalln(sessionErr)
+	}
 }

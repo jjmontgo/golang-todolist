@@ -4,14 +4,11 @@ import (
 	"fmt"
 	"net"
 	"net/smtp"
+	"net/url"
+	"net/http"
 	"crypto/tls"
 	"log"
 	"os"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
-	"time"
 )
 
 // for sending email locally
@@ -31,41 +28,21 @@ func Email(to string, subject string, body string, from string) {
 	}
 
 	if os.Getenv("MODE") == "prod" {
-		postEmailToAmazonDynamoDB(to, subject, body, from)
+		sendViaEmailService(to, subject, body, from)
 		return
 	}
 
 	sendSmtpEmail(to, subject, body, from)
 }
 
-type EmailRecord struct {
-	Id int64`json:"id"`
-	To string`json:"to"`
-	From string`json:"from"`
-	Subject string`json:"subject"`
-	Body string`json:"body"`
-}
-
-func postEmailToAmazonDynamoDB(to string, subject string, body string, from string) {
-	sess := session.Must(session.NewSession())
-	svc := dynamodb.New(sess)
-	emailRecord := EmailRecord{
-		Id: time.Now().UnixNano() / int64(time.Millisecond), // time in ms
-		To: to,
-		From: from,
-		Subject: subject,
-		Body: body,
-	}
-	av, err := dynamodbattribute.MarshalMap(emailRecord)
-	input := &dynamodb.PutItemInput{
-		Item: av,
-		TableName: aws.String("email-service"),
-	}
-	_, err = svc.PutItem(input)
-	if err != nil {
-		log.Println("Got error calling PutItem:")
-		log.Println(err.Error())
-	}
+func sendViaEmailService(to string, subject string, body string, from string) {
+	// "https://k8fwzy59a0.execute-api.us-east-1.amazonaws.com/prod/"
+	http.PostForm(os.Getenv("EMAIL_SERVICE_URL"), url.Values{
+		"to": {to},
+		"subject": {subject},
+		"body": {body},
+		"from": {from},
+	})
 }
 
 // local dev emails are sent through SMTP

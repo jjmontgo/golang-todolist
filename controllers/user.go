@@ -8,6 +8,10 @@ import (
 func init() {
 	this := frame.NewController("User")
 
+	this.IsAccessible = func(actionName string) bool {
+		return this.UserIsLoggedIn()
+	}
+
 	this.Actions["Index"] = func() {
 		var users []model.User
 		this.DB().Find(&users)
